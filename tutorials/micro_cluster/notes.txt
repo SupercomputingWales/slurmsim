@@ -1,0 +1,126 @@
+WORKFLOW
+
+This section briefly describes the workflow in the docker container
+that is built from the Dockerfile in 
+
+slurm_sim_tools/docker_files/slurm_sim
+
+CALL TREE
+
+ The top-level script is /install_files/initial_test.sh.
+ mysql database 'slurm_micro2sim' is created and set to be used.
+ Then a python, bash and R scripts are called.
+ 1 micro_cluster_setup.py
+  1.1 micro_ws_config.sh
+   1.1.1 cp_slurm_conf_dir.py (~180 lines)
+     Sets up and configures workspace. Copies the content of the 'etc' 
+     directory 
+     slurm_sim_ws/slurm_sim_tools/reg_testing/micro_cluster/etc
+     into a new 'etc' directory
+     /slurm_sim_ws/sim/micro/baseline/etc
+     and updates contents of some .conf files (slurm.conf, slurmdbd.conf,
+     sim.conf) in the new etc (changing only paths)
+  1.2 startup slurmdbd
+  1.3 populate_slurm_db.sh    
+   The SLURM_CONF environment variable is set to point to 
+   the file in the newly created etc directory, and then
+   A number of calls to the command sacctmgr to set up all the users
+   sacctmgr -i add cluster/user/QoS
+  1.4 generate_job_trace.sh
+   A call to the script 
+   1.4.1 12_prep_jobs_for_testrun.R
+    Random jobs are created (500). A test.trace file is generated,
+    along with a CSV version of it.
+    A test.trace binary file is generated with a cpp function contained
+    in save_trace.cpp (file shamelessly copied in two places).
+    The content from test.trace is also saved in csv format in
+    test_trace.csv.
+ 2 run_sim.sh contains a single call to a python script
+  2.1 run_sim.py (514 lines). 
+    Code is well commented. All is contained in the run_sim function.
+   2.1.1 Checks presence of slurm configuration files in location
+     specified in the arguments.
+   2.1.2 Clears the database
+   2.1.3 Removes all logfiles
+   2.1.4 clears spool (?) and state (content of some directory named 
+     like StateSaveLocation and SlurmSpoolDir in slurm.conf
+   2.1.5 Checks the dictionaries obtained from slurm.conf, sim.conf and 
+     slurmdbd.conf for errors
+   2.1.6 Start slurmdbd
+   2.1.7 Start slurmctld
+     Wait for slurmctld to finish. THE MAGIC HAPPENS HERE!
+     Job traces are stored in a file which is set in sim.conf -
+     JobsTraceFile (see also slurm_simulator:src/common/sim/sim_conf.c
+   2.1.8 Copy files from slurm - defined in slurm.conf - 
+     to result directory (named '$pwd/results')
+   2.1.9 Process some outputs sprioFileOut and SimStats
+ 3 Run R scripts to analyse results   
+   note: filenames written in R scripts must agree with the ones in 
+   slurm.conf
+   
+JOB TRACE
+
+The job trace is a .csv file but also a binary file, which is the one 
+read by the slurm simulator - the location is set in sim.conf, in the
+JobsTraceFile. Each trace is a structure of this kind (from 
+slurm_simulator/src/common/sim/sim.h):
+
+
+typedef struct job_trace {
+    int  job_id;
+    char *username;
+    long int submit; /* relative or absolute? */
+    int  duration;
+    int  wclimit;
+    int  tasks;
+    char *qosname;
+    char *partition;
+    char *account;
+    int  cpus_per_task;
+    int  tasks_per_node;
+    char *reservation;
+    char *dependency;
+    uint64_t pn_min_memory;/* minimum real memory (in MB) per node OR
+     * real memory per CPU | MEM_PER_CPU,
+     * NO_VAL use partition default,
+     * default=0 (no limit) */
+    char *features;
+    char *gres;
+    int shared;/* 2 if the job can only share nodes with other
+     *   jobs owned by that user,
+     * 1 if job can share nodes with other jobs,
+     * 0 if job needs exclusive access to the node,
+     * or NO_VAL to accept the system default.
+     * SHARED_FORCE to eliminate user control. */
+    long int cancelled; /* time when job should be cancelled, 0 if never */
+    struct job_trace *next;
+} job_trace_t;
+
+CSV field name     - sacct manual entry
+
+ Description of what we need and why
+"job_id"           = JobId
+"submit"           = Submit
+"wclimit"          = Timelimit
+"duration"         = // End-Start
+"tasks"            = NTasks                                             
+"tasks_per_node"   = ?? // int(NTasks/NNodes) ?
+"username"         = User
+"submit_ts"        = //seems the same as submit but as UNIX time minus 18000sec (it's R conversion from date to integer?)
+"qosname"          = QOS
+"partition"        = Partition
+"account"          = Account
+"req_mem"          = ReqMem
+"req_mem_per_cpu"  = // can be set to zero, looking at the examples
+"features"         = ?? // constraints set with -C or --constraints in sbatch // no info in sacct?
+"gres"             = ReqGRES
+"shared"           = ?? // there is no info in sacct?  
+"cpus_per_task"    = ?? // likely NCPUS/NTasks
+"dependency"       = ?? // there is no info in sacct
+"cancelled_ts"     = ?? // From State and the End field
+#"freq"             = No meaning for slurm, only a check for examples in tutorials
+
+Command used to retrieve data from slurm:
+
+sacct --format JobIdRaw,Submit,Timelimit,End,Start,NTasks,NNodes,User,QOS,Partition,Account,ReqMem,ReqGRES,NCPUS,State --allocations --parsable2 --allusers
+
