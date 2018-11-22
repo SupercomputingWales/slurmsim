@@ -3,7 +3,7 @@ library(RSlurmSimTools)
 
 # change working directory to script location
 top_dir <- dirname(rstudioapi::getActiveDocumentContext()$path)
-setwd(top_dir)
+#setwd(top_dir) # DEBUG
 
 #library(ggplot2)
 #library(scales)
@@ -265,7 +265,8 @@ trace<-trace[order(trace$sim_submit_ts),]
 trace$sim_job_id <- 1:N + 1000L
 
 #write job trace for Slurm Simulator
-write_trace(file.path(top_dir,"test.trace"),trace)
+#write_trace(file.path(top_dir,"test.trace"),trace)  # DEBUG
+write_trace(file.path('.',"test.trace"),trace)   # DEBUG
 
 #write job trace as csv for reture reference
 write.csv(trace,"test_trace.csv")

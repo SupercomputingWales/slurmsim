@@ -2,6 +2,7 @@
 library(RSlurmSimTools)
 library(tidyverse)
 library(lubridate)
+library(stringr)
 
 # change working directory to script location
 #top_dir <- dirname(rstudioapi::getActiveDocumentContext()$path)
@@ -11,9 +12,7 @@ library(lubridate)
 #library(lubridate)
 #library(stringr)
 
-#sacct_output <- read.csv2(file.path(top_dir,'sacct_output.csv'), sep = '|') # DEBUG
-sacct_output <- read.csv2(file.path('.','sacct_output.csv'), sep = '|') # DEBUG
-
+sacct_output <- read.csv2('sacct_output.csv', sep = '|') # DEBUG
 
 # Checking that the file read contains the following data
 
@@ -74,14 +73,14 @@ if(!condition) stop("Column names in sacct_output.csv do not meet expectations")
 #
 
 
-(sacct_output$End == 'Unknown') %>% length -> n_end_unknown
+(sacct_output$End == 'Unknown') %>% sum -> n_end_unknown
 if(n_end_unknown != 0 ){
-    warning("There are unfinished jobs in the list. Ignoring them.")
+    warning("There are ", n_end_unknown, " unfinished jobs in the list. Ignoring them.")
 }
 sacct_output <- sacct_output[ (sacct_output$End != 'Unknown'), ]
 
 
-sim_job_id <-  sacct_output$JobIdRaw                   # 
+sim_job_id <-  sacct_output$JobIDRaw                   # 
 sim_submit <-  sacct_output$Submit %>% ymd_hms         #   
 
 get_min_duration <- function(x){
@@ -102,7 +101,10 @@ sim_duration <-
     (( sacct_output$End %>% ymd_hms) - ( sacct_output$Start %>% ymd_hms)) %>%
     as.integer(., units='secs')  #
 
+# NTasks from sacct output can be NA. If so, we use NCPUS
+missing_ntasks_indices <- is.na(sacct_output$NTasks)
 sim_tasks <- as.integer(sacct_output$NTasks)
+sim_tasks[missing_ntasks_indices] <- as.integer(sacct_output$NCPUS[missing_ntasks_indices])
 
 sim_tasks_per_node <- as.integer(sim_tasks/as.integer(sacct_output$NNodes))
 sim_username <- as.character(sacct_output$User)
@@ -111,13 +113,59 @@ sim_qosname <- sacct_output$QOS
 sim_partition <- sacct_output$Partition
 sim_account <- as.character(sacct_output$Account)
 
-## WIP
-## TODO
+tmp_req_mem <- sacct_output$ReqMem
+tmp_numbers <- as.integer(str_extract(tmp_req_mem,"^[0-9]*"))
+tmp_literals <- str_extract(tmp_req_mem,"[:alpha:]*$")
+sim_req_mem <- tmp_numbers*(1000*grepl('^G',tmp_literals)
+                             +1*grepl('^M',tmp_literals)) %>% as.integer
+
+if(!(grepl('c$',sacct_output$ReqMem) | grepl('n$',sacct_output$ReqMem)) 
+   %>% all){
+    stop('Error in ReqMem format')
+}
+sim_req_mem_per_cpu <- grepl('c$',tmp_literals) %>% as.integer
+sim_features <- factor(character(length(sim_job_id))) # empty
+sim_gres <- sacct_output$ReqGRES
+sim_shared <- character(length(sim_job_id)) %>% as.integer
+sim_cpus_per_task <- (sacct_output$NCPUS / sim_tasks) %>% as.integer
+
+sim_dependency <- factor(character(length(sim_job_id))) # empty
+
+sim_cancelled_ts <- integer(length(sim_job_id)) 
+cancelled_jobs_indices <- grepl('CANCELLED',sacct_output$State)
+
+sim_cancelled_ts[cancelled_jobs_indices] <- 
+    ( sacct_output$End[cancelled_jobs_indices]%>% ymd_hms)%>% 
+    as.integer(., units='secs')  
+
+freq <- numeric(length(sim_job_id))
+
+trace_scw <- data.frame(
+                     sim_job_id,
+                     sim_submit,
+                     sim_wclimit,
+                     sim_duration,
+                     sim_tasks,
+                     sim_tasks_per_node,
+                     sim_username,
+                     sim_submit_ts,
+                     sim_qosname,
+                     sim_partition,
+                     sim_account,
+                     sim_req_mem,
+                     sim_req_mem_per_cpu,
+                     sim_features,
+                     sim_gres,
+                     sim_shared,
+                     sim_cpus_per_task,
+                     sim_dependency,
+                     sim_cancelled_ts,
+                     freq
+                     )
 
 
-#
-##write job trace for Slurm Simulator
-#write_trace(file.path('.',"test.trace"),trace)   # DEBUG
-#
-##write job trace as csv for reture reference
-#write.csv(trace,"test_trace.csv")
+#write job trace for Slurm Simulator
+write_trace(file.path(top_dir,"test.trace"),trace_scw)   # DEBUG
+
+#write job trace as csv for reture reference
+write.csv(trace,"test_trace.csv")
