@@ -31,12 +31,7 @@ RUN \
         mkdir sim && \
         cd /home/slurm/slurm_sim_ws && \
         git clone https://sa2c-gitlab.swansea.ac.uk/michele.mesiti/slurmsim.git ./slurm_sim_tools && \
-        cd /home/slurm/slurm_sim_ws/slurm_sim_tools/scw/ && \
-        ssh sunbird 'sacct --format JobIdRaw,Submit,Timelimit,End,Start,NTasks,NNodes,User,QOS,Partition,Account,ReqMem,ReqGRES,NCPUS,State --allocations --parsable2 --allusers --starttime=092018 --endtime=102018' > /home/slurm/slurm_sim_ws/slurm_sim_tools/scw/sacct_output.csv && \
-        ssh sunbird 'sacctmgr list user --parsable2' > \
-        /home/slurm/slurm_sim_ws/slurm_sim_tools/scw/users_accounts.csv && \
-        ssh sunbird 'sacctmgr list QOS --parsable2' > \
-        /home/slurm/slurm_sim_ws/slurm_sim_tools/scw/QOS_data.csv 
+        cd /home/slurm/slurm_sim_ws/slurm_sim_tools/scw/
 USER root
 
 
@@ -112,6 +107,8 @@ COPY ./populate_slurmdb.sh /install_files
 COPY ./generate_job_trace.sh /install_files
 COPY ./run_sim.sh /install_files
 COPY ./check_results.R /install_files
+COPY ./download_slurm_conf_from_sunbird.sh /install_files
+COPY ./sacctmgr_output_to_sacctmgr_commands.py /install_files
 
 
 # need to expose port 22 to allow for ssh to work properly
