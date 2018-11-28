@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#This python script sets up the micro Cluster simulation to run by calling other scripts
+#This python script sets up the scw Cluster simulation to run by calling other scripts
 
 # using these to work with calling files to do things
 import os
@@ -46,7 +46,7 @@ if __name__ == "__main__":
 	process_list = [] # starts a list of processes (each process is added to it)
 
 
-	#microcluster workspace and slurm configuration setup
+	#scwcluster workspace and slurm configuration setup
 	setup_ws_config_proc = start_finish_process("/install_files/scw_ws_config.sh") 
 	process_list.append(setup_ws_config_proc)
 	
@@ -73,7 +73,7 @@ if __name__ == "__main__":
 	# calls file that generates all the test jobs for the test simulation	
 	gen_jobs_proc = start_finish_process("/install_files/generate_job_trace.sh")
 
-	# Done setting up the micro cluster sim - ready to run it
+	# Done setting up the scw cluster sim - ready to run it
 
 
 

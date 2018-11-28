@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# This script sets up the workspace and slurm configuration for the micro cluster simulation
+# This script sets up the workspace and slurm configuration for the scw cluster simulation
 
 echo "Starting scw cluster sim ws and slurm configuration...."
 
-# initiating workspace for micro-cluster simulation
+# initiating workspace for scw-cluster simulation
 cd /home/slurm/slurm_sim_ws
 mkdir -p /home/slurm/slurm_sim_ws/sim/scw
 

@@ -1,15 +1,15 @@
 #!/bin/bash
 
 
-# this script sets up the micro cluster simulation and runs it, checking if it works properly
+# this script sets up the scw cluster simulation and runs it, checking if it works properly
 
 echo "Setting up Micro Cluster simulation...."
 
 # creates and uses mysql database needed for the simulation
-mysql -e "CREATE DATABASE slurm_micro2sim;"
-mysql -e "USE slurm_micro2sim;"
+mysql -e "CREATE DATABASE slurm_scwsim;"
+mysql -e "USE slurm_scwsim;"
 
-# calls the setup file for the micro Cluster simulation (executes as slurm)
+# calls the setup file for the scw Cluster simulation (executes as slurm)
 su slurm -c /install_files/scw_cluster_setup.py
 
 echo "Done with Micro Cluster Setup"

@@ -11,7 +11,8 @@ SACCTMGR=/home/slurm/slurm_sim_ws/slurm_opt/bin/sacctmgr
 
 $SACCTMGR -i add cluster sunbird
 
-python3 ./sacctmgr_output_to_sacctmgr_commands.py \
+# setting up the QOSes
+python3 ./sacctmgr_output_to_sacctmgr_commands_QOS.py \
     /home/slurm/slurm_sim_ws/slurm_sim_tools/scw/QOS_data.csv | bash || exit 1
 
 # add accounts
@@ -23,16 +24,14 @@ do
 done
 
 
-# add users
-USER_IDX=1
-
-for USER_ACCOUNT in $(cut -d'|' -f$USER_IDX,$ACCOUNT_IDX $USERS_ACCOUNTS | tail -n +2 | sort | uniq)
-do
-   USER=$(echo $USER_ACCOUNT | cut -d'|' -f1)
-   ACCOUNT=$(echo $USER_ACCOUNT | cut -d'|' -f2)
-   $SACCTMGR -i add user name=$USER DefaultAccount=$ACCOUNT MaxSubmitJobs=30 || exit 1
-done
-
-$SACCTMGR -i modify user set qoslevel="normal,supporters" || exit
+# add users, accounts, associations to the database
+# using the previously loaded
+sacctmgr load /home/slurm/slurm_sim_ws/slurm_sim_tools/scw/sunbird.cfg 
+if test "$?" -ne "0"
+then 
+    echo "Loading of slurm association database dump failed: the command"
+    echo "sacctmgr load /home/slurm/slurm_sim_ws/slurm_sim_tools/scw/sunbird.cfg" 
+    echo "returned a non zero exit status. Exiting."
+fi
 
 unset SLURM_CONF

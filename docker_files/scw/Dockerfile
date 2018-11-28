@@ -108,7 +108,7 @@ COPY ./generate_job_trace.sh /install_files
 COPY ./run_sim.sh /install_files
 COPY ./check_results.R /install_files
 COPY ./download_slurm_conf_from_sunbird.sh /install_files
-COPY ./sacctmgr_output_to_sacctmgr_commands.py /install_files
+COPY ./slurm_conf_copy_utilities/ /install_files
 
 
 # need to expose port 22 to allow for ssh to work properly
