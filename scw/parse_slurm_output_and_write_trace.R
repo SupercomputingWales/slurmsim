@@ -166,4 +166,4 @@ trace_scw <- data.frame(
 write_trace(file.path(top_dir,"test.trace"),trace_scw)   # DEBUG
 
 #write job trace as csv for reture reference
-write.csv(trace,"test_trace.csv")
+write.csv(trace_scw,"test_trace.csv")
