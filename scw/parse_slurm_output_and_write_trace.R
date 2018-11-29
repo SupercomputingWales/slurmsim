@@ -79,6 +79,9 @@ sim_job_id <-  sacct_output$JobIDRaw                   #
 sim_submit <-  sacct_output$Submit %>% ymd_hms         #   
 
 get_min_duration <- function(x){
+    if(x=='Partition_Limit'){
+        x<-'3-00:00:00' # HARDCODED - CHANGE - TODO 
+    }
     if(grepl('-',x)){
         days_and_rest <- strsplit(x,'-')
         days <- days_and_rest[[1]][[1]]
