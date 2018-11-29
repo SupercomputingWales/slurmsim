@@ -162,6 +162,8 @@ trace_scw <- data.frame(
                      )
 
 
+trace<-trace[order(trace$sim_submit_ts),]
+
 #write job trace for Slurm Simulator
 write_trace(file.path(top_dir,"test.trace"),trace_scw)   # DEBUG
 
