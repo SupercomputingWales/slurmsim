@@ -3,7 +3,7 @@
 # this script installs the needed packages for R to use for the slurm simulator
 
 # installs packages for R from tutorial things
-for(pkg in c("ggplot2","gridExtra","cowplot","lubridate","rPython","stringer","dplyr","rstudioapi")) {
+for(pkg in c("tidyverse","ggplot2","gridExtra","cowplot","lubridate","rPython","stringer","dplyr","rstudioapi")) {
 	install.packages(pkg, contriburl=contrib.url("https://cloud.r-project.org/","source"))
 	print(paste("installed package",pkg))
 }

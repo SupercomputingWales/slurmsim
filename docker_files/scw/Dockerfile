@@ -36,6 +36,7 @@ USER root
 
 
 # installing mysql (mariadb), python, and R, setting everything up all in one Run command 
+	#yum -y install texlive-* && \ # REMOVED TO KEEP THE IMAGE SMALL
 RUN \
 	yum -y install mariadb-server && \
 	yum -y install mariadb-devel && \
@@ -48,8 +49,9 @@ RUN \
 	echo "Python all installed" && \
 	yum -y install R R-Rcpp R-Rcpp-devel && \
 	yum -y install python-devel && \
-	yum -y install texlive-* && \
-	echo "R all installed" && \
+    yum -y install libcurl-devel && \
+    yum -y install libxml2-devel && \
+	echo "R all installed NOTE: not texlive!" && \
 	Rscript /install_files/package_install.R && \
         echo "Installed R packages" && \
         yum -y install sudo && \
@@ -107,7 +109,6 @@ COPY ./populate_slurmdb.sh /install_files
 COPY ./generate_job_trace.sh /install_files
 COPY ./run_sim.sh /install_files
 COPY ./check_results.R /install_files
-COPY ./download_slurm_conf_from_sunbird.sh /install_files
 COPY ./slurm_conf_copy_utilities/ /install_files
 
 

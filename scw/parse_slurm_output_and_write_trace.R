@@ -5,14 +5,9 @@ library(lubridate)
 library(stringr)
 
 # change working directory to script location
-#top_dir <- dirname(rstudioapi::getActiveDocumentContext()$path)
-#setwd(top_dir) # DEBUG
+top_dir <- getwd()
 
-#library(scales)
-#library(lubridate)
-#library(stringr)
-
-sacct_output <- read.csv2('sacct_output.csv', sep = '|') # DEBUG
+sacct_output <- read.csv2(file.path(top_dir,'sacct_output.csv'), sep = '|') 
 
 # Checking that the file read contains the following data
 
