@@ -17,6 +17,11 @@ $SACCTMGR -i add cluster sunbird
 python3 /install_files/sacctmgr_output_to_sacctmgr_commands_QOS.py \
     $SLURM_SIM_TOOLS/scw/QOS_data.csv | bash || exit 1
 
+
+
+$SACCTMGR -i add account name=slurm_account Fairshare=100
+$SACCTMGR -i add user name=slurm DefaultAccount=slurm_account MaxSubmitJobs=1
+
 # THIS IS OBSOLETE SINCE WE HAVE THE DUMP
 # add accounts
 # find accounts from SACCT_OUTPUT
