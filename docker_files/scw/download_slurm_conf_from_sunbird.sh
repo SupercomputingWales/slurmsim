@@ -33,7 +33,8 @@ ask_and_do "ssh $USER_HOST 'sacctmgr list QOS --parsable2' > $COPY_DIR_DESTINATI
 
 # creating user.sim file
 
-grep 'User' $CLUSTER_SLURMDB_DUMP | cut -d\' -f2 | sort | uniq | awk '{print $1":"1000+NR}' > $SLURM_SIM_TOOLS/scw/etc/users.sim
+echo "slurm:1000" >> $SLURM_SIM_TOOLS/scw/etc/users.sim
+grep 'User' $CLUSTER_SLURMDB_DUMP | cut -d\' -f2 | sort | uniq | awk '{print $1":"1000+NR}' >> $SLURM_SIM_TOOLS/scw/etc/users.sim
 
 
 

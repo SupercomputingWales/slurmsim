@@ -14,7 +14,7 @@ SACCTMGR=$SLURM_OPT/bin/sacctmgr
 $SACCTMGR -i add cluster sunbird
 
 # setting up the QOSes
-python3 ./sacctmgr_output_to_sacctmgr_commands_QOS.py \
+python3 /install_files/sacctmgr_output_to_sacctmgr_commands_QOS.py \
     $SLURM_SIM_TOOLS/scw/QOS_data.csv | bash || exit 1
 
 # THIS IS OBSOLETE SINCE WE HAVE THE DUMP
