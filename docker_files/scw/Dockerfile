@@ -98,26 +98,14 @@ CFLAGS="-g -O3 -D NDEBUG=1" && \
 # 8787 is the default port that rstudio server uses, so need to expose it to use it
 EXPOSE 8787
 
-
 USER root
 
+COPY ./copy_all.sh /install_files
 
-COPY ./startup_file.sh /install_files
-COPY ./initial_test.sh /install_files
-COPY ./scw_cluster_setup.py /install_files
-COPY ./scw_ws_config.sh /install_files
-COPY ./populate_slurmdb.sh /install_files
-COPY ./generate_job_trace.sh /install_files
-COPY ./run_sim.sh /install_files
-COPY ./check_results.R /install_files
-COPY ./download_slurm_conf_from_sunbird.sh /install_files
-COPY ./sacctmgr_output_to_sacctmgr_commands_QOS.py /install_files
-COPY ./scw_sim_variables.py /install_files
-COPY ./variables.sh /install_files
+RUN bash /install_files/copy_all.sh 
 
 # need to expose port 22 to allow for ssh to work properly
 EXPOSE 22 
-
 
 # expose for mysql use
 EXPOSE 3306
