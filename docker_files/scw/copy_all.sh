@@ -1,5 +1,5 @@
 #!/bin/bash
-ORIGIN_DIR=/home/slurm/slurm_sim_ws/slurm_sim_tools/scw/docker/scw
+ORIGIN_DIR=/home/slurm/slurm_sim_ws/slurm_sim_tools/docker/scw
 TARGET_DIR=/install_files
 
 cp $ORIGIN_DIR/package_install.R $TARGET_DIR/
