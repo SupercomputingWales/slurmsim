@@ -7,7 +7,7 @@ source /install_files/variables.sh
 export USERS_ACCOUNTS=$SLURM_SIM_TOOLS/scw/users_accounts.csv
 export QOS=$SLURM_SIM_TOOLS/scw/QOS_data.csv 
 export SLURM_CONF=$SLURM_SIM/scw/baseline/etc/slurm.conf
-SACCTMGR=$SLURM_OPT/bin/sacctmgr
+export SACCTMGR=$SLURM_OPT/bin/sacctmgr
 
 
 
