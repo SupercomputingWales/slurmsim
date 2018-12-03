@@ -12,11 +12,11 @@ from sys import stdout,argv
 data = pd.read_csv(argv[1],sep='|')
    
 for t in data.itertuples():
-    stdout.write(f"yes | $SACCTMGR add QOS {t.Name}\n")
-    stdout.write(f"yes | $SACCTMGR modify QOS {t.Name} set ")
+    stdout.write("yes | $SACCTMGR add QOS %s\n" % t.Name)
+    stdout.write("yes | $SACCTMGR modify QOS %s set " % t.Name )
     for k in set(data.keys())-{'Name','GraceTime','MaxSubmitPU'}:
         if pd.notna(getattr(t,k)):
-            stdout.write(f'{k}="{getattr(t,k)}" ')
+            stdout.write('%s="%s" ' %(k,getattr(t,k)))
     # in some cases it does not work. 
     # GraceTime requires a numeric value in seconds instead of a HH:MM:SS
     # string.
@@ -24,10 +24,10 @@ for t in data.itertuples():
         grace_time = getattr(t,'GraceTime')
         h,m,s = grace_time.split(":")
         grace_time = 3600*int(h)+60*int(m)+int(s)
-        stdout.write(f'GraceTime="{grace_time}" ')
+        stdout.write('GraceTime="%d" ' % grace_time)
     # The string 'MaxSubmitPU' is not accepted sacctmgr modify ... set 
     # The string 'MaxSubmitJobsPU' is accepted instead
     if pd.notna(getattr(t,'MaxSubmitPU')):
         value = getattr(t,'MaxSubmitPU')
-        stdout.write(f'MaxSubmitJobsPU="{value}" ')
+        stdout.write('MaxSubmitJobsPU="%s" ' % value)
     stdout.write('\n')
