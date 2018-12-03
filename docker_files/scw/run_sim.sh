@@ -1,12 +1,14 @@
 #!/bin/bash
 
 # This script ensures that the simulation is run from the correct directory
+source /install_files/variables.sh
 
 # goes to baseline directory
-cd /home/slurm/slurm_sim_ws/sim/scw/baseline
+cd $SLURM_SIM/scw/baseline
+
 
 # runs the simulation
-/home/slurm/slurm_sim_ws/slurm_sim_tools/src/run_sim.py -e /home/slurm/slurm_sim_ws/sim/scw/baseline/etc -s /home/slurm/slurm_sim_ws/slurm_opt -d
+$SLURM_SIM_TOOLS/src/run_sim.py -e $SLURM_SIM/scw/baseline/etc -s $SLURM_OPT -d
 
 
 

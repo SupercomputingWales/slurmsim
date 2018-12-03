@@ -32,9 +32,10 @@ RUN \
         cd /home/slurm/slurm_sim_ws && \
         git clone https://sa2c-gitlab.swansea.ac.uk/michele.mesiti/slurmsim.git ./slurm_sim_tools && \
         cd /home/slurm/slurm_sim_ws/slurm_sim_tools/scw/
+
+
+
 USER root
-
-
 # installing mysql (mariadb), python, and R, setting everything up all in one Run command 
 	#yum -y install texlive-* && \ # REMOVED TO KEEP THE IMAGE SMALL
 RUN \
@@ -110,7 +111,9 @@ COPY ./generate_job_trace.sh /install_files
 COPY ./run_sim.sh /install_files
 COPY ./check_results.R /install_files
 COPY ./slurm_conf_copy_utilities/ /install_files
-
+COPY ./sacctmgr_output_to_sacctmgr_commands_QOS.py /install_files
+COPY ./scw_sim_variables.py /install_files
+COPY ./variables.sh /install_files
 
 # need to expose port 22 to allow for ssh to work properly
 EXPOSE 22 
@@ -130,4 +133,4 @@ ENTRYPOINT ["/sbin/cmd_start"]
 CMD ["/install_files/startup_file.sh","/install_files/initial_test.sh"]
 
 
-	
+

@@ -5,7 +5,7 @@
 # using these to work with calling files to do things
 import os
 import subprocess
-
+from scw_sim_variables import slurm_sim_tools_dir,slurm_opt_dir,slurm_sim_dir
 from time import sleep,time # need sleep to do the sleep(3) after dbd
 
 
@@ -51,8 +51,8 @@ if __name__ == "__main__":
 	process_list.append(setup_ws_config_proc)
 	
 	# the two parts of starting slurm dbd in "foreground" mode
-	slurmdbd_loc = "/home/slurm/slurm_sim_ws/slurm_opt/sbin/slurmdbd"
-	slurm_conf_loc = "/home/slurm/slurm_sim_ws/sim/scw/baseline/etc/slurm.conf"
+	slurmdbd_loc = os.path.join(slurm_opt_dir,"sbin/slurmdbd")
+	slurm_conf_loc = os.path.join(slurm_sim_dir,"scw/baseline/etc/slurm.conf")
 	
 	# process to start up the slurmdbd
 	slurmdbd_proc = startup_slurmdbd(slurmdbd_loc, slurm_conf_loc)
