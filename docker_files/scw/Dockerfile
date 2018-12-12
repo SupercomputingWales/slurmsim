@@ -100,7 +100,7 @@ EXPOSE 8787
 
 USER root
 
-COPY ./copy_all.sh /install_files
+COPY ./link_all.sh /install_files
 
 RUN bash /install_files/copy_all.sh 
 
