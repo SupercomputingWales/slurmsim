@@ -30,7 +30,7 @@ RUN \
         cd slurm_sim_ws && \
         mkdir sim && \
         cd /home/slurm/slurm_sim_ws && \
-        git clone https://sa2c-gitlab.swansea.ac.uk/michele.mesiti/slurmsim.git ./slurm_sim_tools && \
+        git clone https://github.com/mmesiti/slurmsim.git ./slurm_sim_tools && \
         cd /home/slurm/slurm_sim_ws/slurm_sim_tools/scw/
 
 
