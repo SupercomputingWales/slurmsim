@@ -17,5 +17,6 @@ slurm_conf_setup.sh \
 startup_file.sh \
 variables.sh 
 do
-  ln -s $ORIGIN_DIR/$file $TARGET_DIR
+  cp $ORIGIN_DIR/$file $TARGET_DIR
+  chmod +x $TARGET_DIR/$file
 done

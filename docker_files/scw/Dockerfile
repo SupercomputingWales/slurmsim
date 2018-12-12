@@ -101,9 +101,9 @@ EXPOSE 8787
 
 USER root
 
-COPY ./link_all.sh /install_files
+COPY ./copy_all.sh /install_files
 
-RUN bash /install_files/link_all.sh 
+RUN bash /install_files/copy_all.sh 
 
 # need to expose port 22 to allow for ssh to work properly
 EXPOSE 22 
