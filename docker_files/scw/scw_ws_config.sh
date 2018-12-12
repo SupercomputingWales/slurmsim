@@ -2,7 +2,7 @@
 
 # This script sets up the workspace and slurm configuration for the scw cluster simulation
 
-source /install_files/variables.sh
+source /install_files/variables.env
 echo "Starting scw cluster sim ws and slurm configuration...."
 
 # initiating workspace for scw-cluster simulation

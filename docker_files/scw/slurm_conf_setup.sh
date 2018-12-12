@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /install_files/variables.sh
+source /install_files/variables.env
 
 echo "This script will download data from "'$USER_HOST(=$1)'", or untar the file"
 echo "$SCW_DATA_PACKAGE"

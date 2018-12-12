@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script ensures that the simulation is run from the correct directory
-source /install_files/variables.sh
+source /install_files/variables.env
 
 # goes to baseline directory
 cd $SLURM_SIM/scw/baseline

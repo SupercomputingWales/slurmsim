@@ -2,7 +2,7 @@
 
 # This script populates the slurmdb with "users" that submit jobs
 
-source /install_files/variables.sh
+source /install_files/variables.env
 
 export USERS_ACCOUNTS=$SLURM_SIM_TOOLS/scw/users_accounts.csv
 export QOS=$SLURM_SIM_TOOLS/scw/QOS_data.csv 
