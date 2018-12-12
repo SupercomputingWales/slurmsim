@@ -38,7 +38,9 @@ else
     echo "Error: file $SCW_DATA_PACKAGE, containing job, qos and association data, does not exist. "
     exit 1
   else
-    tar -xvf $SCW_DATA_PACKAGE
+    cd $(dirname $SCW_DATA_PACKAGE)
+    tar -xvf $(basename $SCW_DATA_PACKAGE)
+    cd -
   fi
 fi
 
