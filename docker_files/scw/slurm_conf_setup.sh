@@ -24,7 +24,7 @@ ask_and_do(){
 
 
 
-if [ $USER_HOST != "" ]
+if [ "$USER_HOST" != "" ]
 then
 
   # getting historical job data from sacct
