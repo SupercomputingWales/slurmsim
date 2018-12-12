@@ -19,9 +19,6 @@ RUN \
 	yum -y install git && \
 	yum clean all
 
-# getting file that installs all the R packages
-COPY ./package_install.R /install_files
-
 # creating all the directories needed for larger run command
 USER slurm 
 RUN \
@@ -36,6 +33,10 @@ RUN \
 
 
 USER root
+# getting file that installs all the R packages
+RUN ln -s /home/slurm/slurm_sim_ws/slurm_sim_tools/docker_files/scw/package_install.R /install_files
+
+
 # installing mysql (mariadb), python, and R, setting everything up all in one Run command 
 	#yum -y install texlive-* && \ # REMOVED TO KEEP THE IMAGE SMALL
 RUN \
@@ -72,7 +73,7 @@ RUN \
         mysql_install_db && \
         chown -R mysql:mysql /var/lib/mysql && \
         cmd_start mysqld && \
-        mysql -e "create user 'slurm'@'localhost' identified by 'slurm';" && \
+        mysql -e "CREATE USER 'slurm'@'localhost' IDENTIFIED BY 'slurm';" && \
         mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'slurm'@'localhost' IDENTIFIED BY 'slurm';" && \
         cmd_stop mysqld && \
 	yum clean all
@@ -102,7 +103,7 @@ USER root
 
 COPY ./link_all.sh /install_files
 
-RUN bash /install_files/copy_all.sh 
+RUN bash /install_files/link_all.sh 
 
 # need to expose port 22 to allow for ssh to work properly
 EXPOSE 22 

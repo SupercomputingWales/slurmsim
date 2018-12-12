@@ -75,12 +75,14 @@ CALL TREE
     slurm.conf
    
 
-JOB TRACE
+JOB TRACES
 
-The job trace is a .csv file but also a binary file, which is the one 
-read by the slurm simulator - the location is set in sim.conf, in the
-JobsTraceFile. Each trace is a structure of this kind (from 
-slurm_simulator/src/common/sim/sim.h):
+The history of all the jobs that have executed on the cluster in a period of time is stored in a 'job trace' file, a list of rows 
+
+The job trace file is a .csv file but it has also got a binary representation,
+which is the one read by the slurm simulator - the location of the binary trace
+file is set in sim.conf, in the JobsTraceFile variable. Each job trace is a
+structure of this kind (from slurm_simulator/src/common/sim/sim.h):
 
 
 typedef struct job_trace {
@@ -147,7 +149,6 @@ Command used to retrieve data from slurm:
 
 sacct --format JobIdRaw,Submit,Timelimit,End,Start,NTasks,NNodes,User,QOS,Partition,Account,ReqMem,ReqGRES,NCPUS,State --allocations --parsable2 --allusers --starttime=092018 --endtime=102018
 
-Notice that starttime and endtime can be changed to select the period of interest.
-
-
+Notice that starttime and endtime can be changed to select the period of
+interest.
 
