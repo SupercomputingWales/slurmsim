@@ -36,7 +36,7 @@ else
   if [ ! -f "$SCW_DATA_PACKAGE" ]
   then
     echo "Error: file $SCW_DATA_PACKAGE, containing job, qos and association data, does not exist. "
-    exit(1)
+    exit 1
   else
     tar -xvf $SCW_DATA_PACKAGE
   fi
