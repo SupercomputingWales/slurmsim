@@ -6,7 +6,6 @@ for file in \
 check_results.R \
 generate_job_trace.sh \
 initial_test.sh \
-package_install.R \
 populate_slurmdb.sh \
 run_sim.sh \
 sacctmgr_output_to_sacctmgr_commands_QOS.py \
