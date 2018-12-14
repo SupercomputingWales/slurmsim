@@ -23,7 +23,7 @@ CALL TREE
 
 
   The top-level script is /install_files/initial_test.sh.
-  mysql database 'slurm_scw2sim' is created and set to be used.
+  mysql database 'slurm_scwsim' is created and set to be used.
   Then a python, bash and R scripts are called.
   1 scw_cluster_setup.py
    1.1 scw_ws_config.sh
