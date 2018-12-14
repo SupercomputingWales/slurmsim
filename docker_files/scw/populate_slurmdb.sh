@@ -9,15 +9,11 @@ export QOS=$SLURM_SIM_TOOLS/scw/QOS_data.csv
 export SLURM_CONF=$SLURM_SIM/scw/baseline/etc/slurm.conf
 export SACCTMGR=$SLURM_OPT/bin/sacctmgr
 
-
-
 $SACCTMGR -i add cluster sunbird
 
 # setting up the QOSes
 python3 /install_files/sacctmgr_output_to_sacctmgr_commands_QOS.py \
     $SLURM_SIM_TOOLS/scw/QOS_data.csv | bash || exit 1
-
-
 
 $SACCTMGR -i add account name=slurm_account Fairshare=100
 $SACCTMGR -i add user name=slurm DefaultAccount=slurm_account MaxSubmitJobs=1
@@ -35,7 +31,7 @@ $SACCTMGR -i add user name=slurm DefaultAccount=slurm_account MaxSubmitJobs=1
 
 # add users, accounts, associations to the database
 # using the previously loaded
-$SACCTMGR load $CLUSTER_SLURMDB_DUMP
+yes | $SACCTMGR load $CLUSTER_SLURMDB_DUMP
 if test "$?" -ne "0"
 then 
     echo "Loading of slurm association database dump failed: the command"

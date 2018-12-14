@@ -10,7 +10,12 @@ mysql -e "CREATE DATABASE slurm_scwsim;"
 mysql -e "USE slurm_scwsim;"
 
 # calls the setup file for the scw Cluster simulation (executes as slurm)
-su slurm -c /install_files/scw_cluster_setup.py
+#su slurm -c /install_files/scw_cluster_setup.py
+
+# done as root to circumvent permission problems, which are not present in the
+# original version.
+# ISSUE
+/install_files/scw_cluster_setup.py 
 
 echo "Done with SCW Cluster Setup"
 
