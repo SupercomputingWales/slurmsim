@@ -46,7 +46,7 @@ fi
 
 # creating user.sim file
 echo "slurm:1000" >> $SLURM_SIM_TOOLS/scw/etc/users.sim
-grep 'User' $CLUSTER_SLURMDB_DUMP | cut -d\' -f2 | sort | uniq | awk '{print $1":"1000+NR}' >> $SLURM_SIM_TOOLS/scw/etc/users.sim
+grep 'User' $CLUSTER_SLURMDB_DUMP | grep -v root | cut -d\' -f2 | sort | uniq | awk '{print $1":"1000+NR}' >> $SLURM_SIM_TOOLS/scw/etc/users.sim
 
 
 
