@@ -8,20 +8,46 @@ slurm_sim_tools/docker_files/scw
 CALL TREE
 
  ADDITIONAL SETUP (after the docker image has been set up)
-  The script /install_files/startup_file.sh is called.
+  1. The script /install_files/startup_file.sh is called.
   It starts:
   - rstudio-server
   - sshd
   - mysqld
   using the 'cmd_start' script provided.
 
+  2. The simulation-case specific data must be provided. Such data consists of:
+   a. The slubmdbd dump ( usually named <cluster_name>.cfg)
+   b. a 'user.sim' file that is used by the simulator. The information 
+     contained in this file can be retrieved from the slurmdbd dump.
+   c. the data about the jobs being simulated - in a csv format. This is the 
+    output of the sacct command.
+   d. the data about the QOS, which is output of the sacctmgr command 
+
+   The retrieval of b.,c.,d. is managed by the script 'slurm_conf_setup.sh',
+   which in the docker container is placed in /install_files. a. must be
+   provided by the sysadmin in all cases. b. is automatically generated from a.
+   by 'slurm_conf_setup.sh'. In order to obtain c. and d., the script can use
+   two methods:
+   A. (recommended)  get c., d. and a. from a tar archive, which needs to be
+     copied into the docker container with
+
+     [sudo?] docker cp <tarfile> <container_name>:<location_on_container>
+
+     For the filename and the location, see 'slurm_conf_setup.sh' and
+     'variables.env'. At the moment of writing, the docker command used is
+
+     sudo docker cp scw.tar <container_name>:/home/slurm/slurm_sim_ws/slurm_sim_tools/scw/scw.tar
+
+   B. run 2 commands - sacct and saccmgr - via ssh. 
+
+   See script for details.
+
+   RESUME OF POINT 2:
+   2.0 Create scw.tar with files a., c. and d.
+   2.1 Copy scw.tar into the running container using 'docker cp'
+   2.2 run the script /install_files/slurm_conf_setup.sh in the container.
+
  ACTUAL RUN
-  Warning: the file 'sunbird.cfg' file, which contains all the information needed 
-  to replicate the user-account-qos associations on the sunbird cluster, must be 
-  copied into the container BEFORE running this - in particular, before running
-  the populate_slurmdbd.sh script.
-
-
   The top-level script is /install_files/initial_test.sh.
   mysql database 'slurm_scwsim' is created and set to be used.
   Then a python, bash and R scripts are called.
