@@ -22,7 +22,9 @@ echo "Done with SCW Cluster Setup"
 echo "Starting simulation...."
 
 # runs the simulation as the slurm user so the simulator doesn't get upset
-su slurm -c /install_files/run_sim.sh
+# su slurm -c /install_files/run_sim.sh
+# Same issue as above, running as root - but this may of course cause problems...
+/install_files/run_sim.sh
 
 echo "Simulation Finished."
 
