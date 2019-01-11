@@ -2,15 +2,8 @@ FROM centos:7
 
 LABEL desc="Slurm simulator made ready - SCW edition"
 
-#Adding in the code from github to be able to start/stop mysql (and sshd?)
-COPY cmd_start /sbin/
-COPY cmd_stop /sbin/
 
-
-# giving permissions to use the cmd from above
 RUN \
-	chmod a+rwx /sbin/cmd_start && \
-	chmod a+rwx /sbin/cmd_stop && \
         mkdir /install_files && \
         useradd -d /home/slurm -ms /bin/bash slurm && \
         usermod -aG wheel slurm && \
@@ -31,8 +24,17 @@ RUN \
         cd /home/slurm/slurm_sim_ws/slurm_sim_tools/scw/
 
 
-
 USER root
+#Adding in the code from github to be able to start/stop mysql (and sshd?)
+RUN  cp /home/slurm/slurm_sim_ws/slurm_sim_tools/docker_files/scw/cmd_start /sbin/
+RUN  cp /home/slurm/slurm_sim_ws/slurm_sim_tools/docker_files/scw/cmd_stop  /sbin/
+
+# giving permissions to use the cmd from above
+RUN \
+	chmod a+rwx /sbin/cmd_start && \
+	chmod a+rwx /sbin/cmd_stop
+
+
 # getting file that installs all the R packages
 RUN ln -s /home/slurm/slurm_sim_ws/slurm_sim_tools/docker_files/scw/package_install.R /install_files
 
@@ -100,9 +102,7 @@ CFLAGS="-g -O3 -D NDEBUG=1" && \
 EXPOSE 8787
 
 USER root
-
-COPY ./copy_all.sh /install_files
-
+RUN cp /home/slurm/slurm_sim_ws/slurm_sim_tools/docker_files/scw/copy_all.sh /install_files
 RUN bash /install_files/copy_all.sh 
 
 # need to expose port 22 to allow for ssh to work properly
