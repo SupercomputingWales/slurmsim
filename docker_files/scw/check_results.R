@@ -51,20 +51,21 @@ done_well = TRUE # assumes did correctly
 for(row in 1:nrow(joined))
 {
 	# checks if all features have been met (or weren't present)
-    done_well = check_nodes(joined, row, "sim_req_mem", 500000, "NodeList", "b") && # big mem
+    done_well_tmp = check_nodes(joined, row, "sim_req_mem", 500000, "NodeList", "b") && # big mem
       check_nodes(joined, row, "sim_features", "CPU-M", "NodeList", "m") && # M cpu
       check_nodes(joined, row, "sim_features", "CPU-N", "NodeList", "n") && # N cpu
       check_nodes(joined, row, "sim_gres", "gpu:1", "NodeList", "g") && # 1 gpu
       check_nodes(joined, row, "sim_gres", "gpu:2", "NodeList", "g") # 2 gpu
   	
 	# if at any point a feature doesn't match, breaks out of the loop
-	if(!done_well) 
+	if(!done_well_tmp) 
 	{
 		# prints out the job id for tracing back what failed
 		jobid = joined[row, "sim_job_id"]
 		print(paste("Id of incorrectly assigned job:", jobid))
-		break
 	}
+
+    done_well = done_well && done_well_tmp
 }
 # prints overall result
 print("Did the simulator do well?.....")
