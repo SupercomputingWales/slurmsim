@@ -29,6 +29,7 @@ check_nodes <- function(df.joined, row_num, trace_col, trace_check, sacct_col, s
 			{
 				# if improper nodes have been assigned, its a false result (didn't assign properly)
 				result = FALSE 
+                print("Issue with "+trace_col+':'+sacct_check+"=/="+ sacct_val)
 			}
 		}
 	}
