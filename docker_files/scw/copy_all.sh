@@ -14,6 +14,7 @@ scw_sim_variables.py \
 scw_ws_config.sh \
 slurm_conf_setup.sh \
 startup_file.sh \
+run_all.sh \
 variables.env 
 do
   cp $ORIGIN_DIR/$file $TARGET_DIR
