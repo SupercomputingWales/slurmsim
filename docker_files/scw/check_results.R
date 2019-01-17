@@ -29,7 +29,7 @@ check_nodes <- function(df.joined, row_num, trace_col, trace_check, sacct_col, s
 			{
 				# if improper nodes have been assigned, its a false result (didn't assign properly)
 				result = FALSE 
-                print("Issue with "+trace_col+':'+sacct_check+"=/="+ sacct_val)
+                print(paste("Issue with ",trace_col,":",sacct_check,"=/=",sacct_val))
 			}
 		}
 	}
@@ -54,9 +54,11 @@ for(row in 1:nrow(joined))
 	# checks if all features have been met (or weren't present)
     done_well_tmp = check_nodes(joined, row, "sim_req_mem", 500000, "NodeList", "b") && # big mem
       check_nodes(joined, row, "sim_features", "CPU-M", "NodeList", "m") && # M cpu
-      check_nodes(joined, row, "sim_features", "CPU-N", "NodeList", "n") && # N cpu
-      check_nodes(joined, row, "sim_gres", "gpu:1", "NodeList", "g") && # 1 gpu
-      check_nodes(joined, row, "sim_gres", "gpu:2", "NodeList", "g") # 2 gpu
+      check_nodes(joined, row, "sim_features", "CPU-N", "NodeList", "n")  # N cpu
+      # Theses checks for gpus are based on a convention on node naming that 
+      # does not hold on the scw clusters.
+      #check_nodes(joined, row, "sim_gres", "gpu:1", "NodeList", "g") && # 1 gpu
+      #check_nodes(joined, row, "sim_gres", "gpu:2", "NodeList", "g") # 2 gpu
   	
 	# if at any point a feature doesn't match, breaks out of the loop
 	if(!done_well_tmp) 
@@ -69,5 +71,6 @@ for(row in 1:nrow(joined))
     done_well = done_well && done_well_tmp
 }
 # prints overall result
+print("WARNING: GPU/node compatibility not checked.")
 print("Did the simulator do well?.....")
 print(done_well)
