@@ -1,0 +1,2 @@
+This directory contains some scripts that I have used to run the containers.
+In lib.sh, a number of useful bash functions have been defined.
