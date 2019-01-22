@@ -119,7 +119,7 @@ RUN \
 
 # sets cmd_start as entrypoint, then runs the startup file and the initial test file
 ENTRYPOINT ["/sbin/cmd_start"]
-CMD ["/install_files/startup_file.sh","/install_files/slurm_conf_setup.sh","/install_files/initial_test.sh"]
+#CMD ["/install_files/startup_file.sh","/install_files/slurm_conf_setup.sh","/install_files/initial_test.sh"]
 
 
 
