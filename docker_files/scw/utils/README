@@ -1,2 +1,13 @@
-This directory contains some scripts that I have used to run the containers.
+
+Contains some scripts that I have used to run the containers and to analyse the 
+data and produce the plots.
+
+#############################
+##  Running the containers ##
+#############################
+
 In lib.sh, a number of useful bash functions have been defined.
+
+#############################
+## Analysis and plots #######
+#############################
