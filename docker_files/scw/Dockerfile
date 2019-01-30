@@ -21,7 +21,8 @@ RUN \
         mkdir sim && \
         cd /home/slurm/slurm_sim_ws && \
         git clone https://github.com/mmesiti/slurmsim.git ./slurm_sim_tools && \
-        cd /home/slurm/slurm_sim_ws/slurm_sim_tools/scw/
+        cd /home/slurm/slurm_sim_ws/slurm_sim_tools/scw/ && \
+        git checkout hawk
 
 
 USER root

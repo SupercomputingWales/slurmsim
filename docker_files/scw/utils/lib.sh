@@ -64,10 +64,10 @@ create_scw_tar(){
   END=$2
 
   cp ../$(sacct_output_filename $START $END) ./sacct_output.csv
-  cp ../sunbird.cfg ./
+  cp ../hawk.cfg ./
   cp ../QOS_data.csv ./
 
-  tar -cvf scw.tar sacct_output.csv sunbird.cfg QOS_data.csv
+  tar -cvf scw.tar sacct_output.csv hawk.cfg QOS_data.csv
 
 }
 

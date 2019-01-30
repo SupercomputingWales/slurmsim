@@ -1,0 +1,184 @@
+# Ansible managed
+#SLURM CONFIGURATION FILE
+#-----------------------------------------------------------
+# Configuration PRODUCTION     23/02/2018
+#-----------------------------------------------------------
+# Historique :
+# 23/09/17 : AP : Initial version
+#-----------------------------------------------------------
+
+ClusterName=hawk
+ControlMachine=ch2,ch1
+ControlAddr=10.212.1.105
+
+SlurmUser=slurm
+SlurmctldPort=6817
+SlurmdPort=6818
+
+AuthType=auth/munge
+CryptoType=crypto/munge
+
+StateSaveLocation=/etc/slurm/SLURM
+SlurmdSpoolDir=/var/log/slurm/spool_slurmd
+SlurmctldPidFile=/var/run/slurmctld.pid
+SlurmdPidFile=/var/run/slurmd.pid
+CacheGroups=0
+ReturnToService=0
+SlurmctldTimeout=300
+SlurmdTimeout=400
+MessageTimeout=40
+InactiveLimit=0
+MinJobAge=300
+KillWait=30
+Waittime=0
+SchedulerType=sched/backfill
+#SchedulerParameters=default_queue_depth=5,bf_interval=5,bf_window=20,kill_invalid_depend
+SchedulerParameters=default_queue_depth=250,bf_interval=30,bf_resolution=120,bf_window=4320,bf_continue,bf_max_job_user=25,kill_invalid_depend
+SelectType=select/cons_res
+SelectTypeParameters=CR_Core_Memory,CR_CORE_DEFAULT_DIST_BLOCK
+FastSchedule=1
+TCPTimeout=60
+
+# TOPOLOGY
+Topologyplugin=topology/tree
+
+Proctracktype=proctrack/cgroup
+
+JobSubmitPlugins=lua
+
+# Change these to be your pre/post job scripts
+Prolog=/apps/slurm/slurm_prolog
+Epilog=/apps/slurm/slurm_epilog
+
+# Added for slurm_pam_adopt
+PrologFlags=contain
+
+# CPU affinity
+# Changed by AP - 16 May
+#TaskPlugin=task/cgroup
+TaskPlugin=task/affinity
+TaskPluginParam=Cpusets
+
+
+TreeWidth=300
+
+# Fair share scheduling parameters
+PriorityType=priority/multifactor
+PriorityFlags=FAIR_TREE #,SMALL_RELATIVE_TO_TIME
+PriorityDecayHalfLife=7-0
+#PriorityUsageResetPeriod=14-0
+PriorityWeightFairshare=10000
+PriorityWeightAge=1000
+PriorityWeightPartition=1000
+PriorityWeightJobSize=10000
+PriorityMaxAge=7-0
+PriorityFavorSmall=NO
+
+# LOGGING
+#DebugFlags=CPU_Bind,gres
+SlurmctldDebug=3
+SlurmctldLogFile=/var/log/slurm/slurmctld.log
+SlurmdDebug=3
+SlurmdLogFile=/var/log/slurm/slurmd.log.%h
+
+# For older MPIs
+MpiParams=ports=12000-18400
+MpiDefault=pmi2
+
+# With firewall on login nodes internal ethernet interfaces, srun can be blocked from 
+# talking to compute nodes on interactive jobs unless we define a set range:
+# Ade, 21/06/2018
+SrunPortRange=60001-61000
+
+AcctGatherEnergyType=acct_gather_energy/rapl
+AcctGatherNodeFreq=30
+
+# Bull additional
+#AcctGatherFilesystemType=acct_gather_filesystem/lustre		# Candidate for lustre tres recording
+#AcctGatherInfinibandType=acct_gather_infiniband/ofed		# Candidate for ofed tres recording
+AcctGatherProfileType=acct_gather_profile/none
+
+JobAcctGatherFrequency=300
+JobAcctGatherType=jobacct_gather/cgroup	
+
+#
+# Licensing
+#
+#Licenses=starccm:1300
+Licenses=fluent:30,ansys:100,intelcs:5
+
+# Configure support for our GPUs
+GresTypes=gpu
+
+# Clock frequency control
+CpuFreqGovernors=UserSpace,Performance,OnDemand
+
+#PrivateData=jobs,accounts,usage,users
+
+### This is the section that needs to be disabled if the accounting fix does not work -MG
+# QOS 
+AccountingStorageEnforce=associations,qos,limits
+AccountingStorageType=accounting_storage/slurmdbd
+AccountingStorageHost=chslurm
+AccountingStoragePort=7031
+#AccountingStorageLoc=slurmdb	#Ade, don't think needed unless direct connection to mysql
+### End of Section -MG
+
+# Node definitions
+NodeName=ccs[0001-0136] Sockets=2 CoresPerSocket=20 ThreadsPerCore=1 RealMemory=191000  State=UNKNOWN
+NodeName=ccs[1001-1026] Sockets=2 CoresPerSocket=20 ThreadsPerCore=1 RealMemory=383000  State=UNKNOWN
+NodeName=ccs[2001-2013] Sockets=2 CoresPerSocket=20 ThreadsPerCore=1 RealMemory=383000  Gres=gpu:2  State=UNKNOWN
+NodeName=ccs[3001-3026] Sockets=2 CoresPerSocket=20 ThreadsPerCore=1 RealMemory=191000  State=UNKNOWN
+#NodeName=ccr[0001-0084] Sockets=2 CoresPerSocket=12 ThreadsPerCore=1 RealMemory=127000  State=UNKNOWN
+##
+NodeName=ccs[9001-9003] Sockets=2 CoresPerSocket=20 ThreadsPerCore=1 RealMemory=191000  State=UNKNOWN
+#
+NodeName=ccs9201 Sockets=2 CoresPerSocket=20 ThreadsPerCore=1 RealMemory=383000  Gres=gpu:2  State=UNKNOWN
+#
+# DIRI node in HT:
+NodeName=ccs9202 Sockets=2 CoresPerSocket=20 ThreadsPerCore=2 RealMemory=383000  Gres=gpu:2  State=UNKNOWN
+
+# Partition definitions
+# These will need changing before we go into production!
+
+#PartitionName=compute             Nodes=ccs[0001-0134]                Default=YES DefMemPerCPU=4775 MaxTime=72:00:00                  State=UP QOS=compute_default
+# IN TEST: ~ third of the highmem and GPU nodes co-allocated to compute & htc to attempt to benefit wait time & throughput
+PartitionName=compute             Nodes=ccs[0001-0134],ccs[1008-1026],ccs[2006-2013]                Default=YES DefMemPerCPU=4775 MaxTime=72:00:00                 State=UP QOS=compute_default
+PartitionName=xcompute            Nodes=ccs[0001-0134]                            DefMemPerCPU=4775 MaxTime=72:00:00                  State=UP Priority=9          AllowGroups=scw1001,scw1125
+
+#Nodes kept for remaining acceptance testing, available to SCW and ATOS/Mellanox only:
+#PartitionName=compute64           Nodes=ccs[0001-0011],ccs[0049-0059]             DefMemPerCPU=4775 MaxTime=72:00:00                  State=UP                     AllowGroups=scw1001,scw1125
+
+PartitionName=highmem             Nodes=ccs[1001-1026]                            DefMemPerCPU=9550 MaxTime=72:00:00                  State=UP QOS=highmem_default
+PartitionName=xhighmem            Nodes=ccs[1001-1026]                            DefMemPerCPU=9550 MaxTime=72:00:00                  State=UP Priority=9          AllowGroups=scw1001
+
+PartitionName=gpu                 Nodes=ccs[2001-2013]                            DefMemPerCPU=9550 MaxTime=48:00:00                  State=UP QOS=gpu_default
+PartitionName=xgpu                Nodes=ccs[2001-2013]                            DefMemPerCPU=9550 MaxTime=48:00:00                  State=UP Priority=9          AllowGroups=scw1001
+
+#PartitionName=htc                 Nodes=ccs[3001-3026]                            DefMemPerCPU=4775 MaxTime=72:00:00 ExclusiveUser=NO State=UP QOS=htc_default
+# IN TEST: ~ half of the highmem and GPU nodes co-allocated to compute & htc to attempt to benefit wait time & throughput
+PartitionName=htc                 Nodes=ccs[3001-3026],ccs[1008-1026],ccs[2006-2013]                            DefMemPerCPU=4775 MaxTime=72:00:00 ExclusiveUser=NO State=UP QOS=htc_default
+PartitionName=xhtc                Nodes=ccs[3001-3026]                            DefMemPerCPU=4775 MaxTime=72:00:00                  State=UP Priority=9          AllowGroups=scw1001
+
+PartitionName=dev                 Nodes=ccs[0135-0136]                            DefMemPerCPU=4775 MaxTime=00:30:00 ExclusiveUser=NO State=UP QOS=dev_default 
+PartitionName=xdev                Nodes=ccs[0135-0136]                            DefMemPerCPU=4775 MaxTime=06:00:00                  State=UP Priority=9          AllowGroups=scw1001
+
+#
+PartitionName=c_compute_chemy1    Nodes=ccs9001                                   DefMemPerCPU=4775 MaxTime=72:00:00                  State=UP                     AllowAccounts=scw1001               AllowGroups=scw1001
+#
+PartitionName=c_compute_mdi1      Nodes=ccs[9002-9003]                            DefMemPerCPU=4775 MaxTime=72:00:00                  State=UP                     AllowAccounts=scw1001,scw1381       AllowGroups=scw1001,scw1381
+#
+PartitionName=c_gpu_comsc1        Nodes=ccs9201					  DefMemPerCPU=9550 MaxTime=72:00:00                  State=UP                     AllowAccounts=scw1001,scw1140,scw1390,scw1395       AllowGroups=scw1001,scw1140,scw1390,scw1395
+# DIRI node in HT so half the per-core memory:
+PartitionName=c_gpu_diri1         Nodes=ccs9202                                   DefMemPerCPU=4775 MaxTime=72:00:00                  State=UP                     AllowAccounts=scw1001,scw1158,scw1393       AllowGroups=scw1001,scw1158,scw1393
+#
+PartitionName=xexternal           Nodes=ccs[9001-9003],ccs[9201-9202]                                                                 State=UP Priority=9          AllowGroups=scw1001
+
+#RAVEN:
+#PartitionName=compute_B520_128_24 Nodes=ccr00[01-60]                                 MaxTime=INFINITE State=UP
+
+#PartitionName=compute_B520_256_28 Nodes=ccr00[61-72]                                 MaxTime=INFINITE State=UP
+
+#PartitionName=compute_B520_256_24 Nodes=ccr00[73-84]                                 MaxTime=INFINITE State=UP
+
+#PartitionName=all Nodes=ccs[0001-0131],ccs[1001-1025],ccs[2001-2013],ccs[3001-3026],ccr[0001-0083] MaxTime=INFINITE State=UP
