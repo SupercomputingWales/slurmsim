@@ -9,7 +9,7 @@ export QOS=$SLURM_SIM_TOOLS/scw/QOS_data.csv
 export SLURM_CONF=$SLURM_SIM/scw/baseline/etc/slurm.conf
 export SACCTMGR=$SLURM_OPT/bin/sacctmgr
 
-$SACCTMGR -i add cluster hawk
+$SACCTMGR -i add cluster sunbird
 
 # setting up the QOSes
 python3 /install_files/sacctmgr_output_to_sacctmgr_commands_QOS.py \
