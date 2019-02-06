@@ -22,14 +22,15 @@ CALL TREE
    c. the data about the jobs being simulated - in a csv format. This is the 
     output of the sacct command.
    d. the data about the QOS, which is output of the sacctmgr command 
+   e. (Optional) Another slurm.conf file. NOTICE: The slurm.conf file from the
+   cluster must actually be modified in order to work with the simulator.
+   DO NOT SIMPLY TAKE THE slurm.conf FILE FROM THE CLUSTER AND PUT IT IN THE 
+   scw.tar ARCHIVE, IT WILL NOT WORK.
 
-   The retrieval of b.,c.,d. is managed by the script 'slurm_conf_setup.sh',
-   which in the docker container is placed in /install_files. a. must be
-   provided by the sysadmin in all cases. b. is automatically generated from a.
-   by 'slurm_conf_setup.sh'. In order to obtain c. and d., the script can use
-   two methods:
-   A. (recommended)  get c., d. and a. from a tar archive, which needs to be
-     copied into the docker container with
+   File (a.) must be provided by the sysadmin in all cases. b. is automatically
+   generated from a.  by 'slurm_conf_setup.sh'. In order to obtain c. and d.,
+   the script can get a.,c. and d. (and optionally e.) from a tar archive, 
+   which needs to be copied into the docker container with
 
      [sudo?] docker cp <tarfile> <container_name>:<location_on_container>
 
@@ -38,12 +39,10 @@ CALL TREE
 
      sudo docker cp scw.tar <container_name>:/home/slurm/slurm_sim_ws/slurm_sim_tools/scw/scw.tar
 
-   B. run 2 commands - sacct and saccmgr - via ssh. 
-
    See script for details.
 
    RESUME OF POINT 2:
-   2.0 Create scw.tar with files a., c. and d.
+   2.0 Create scw.tar with files a., c. and d. (and optionally e.)
    2.1 Copy scw.tar into the running container using 'docker cp'
    2.2 run the script /install_files/slurm_conf_setup.sh in the container.
 
