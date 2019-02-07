@@ -47,10 +47,18 @@ RUN \
 	yum -y install mariadb-devel && \
 	echo "Done installing Mariadb" && \
 	yum -y install gcc-c++ && \
-	yum -y install install epel-release && \
-	yum -y install python34 python34-libs python34-devel python34-numpy python34-scipy python34-pip && \
-	pip3 install pymysql && \
-	pip3 install pandas && \
+	yum -y install install epel-release
+
+RUN \
+	yum -y install python36 python36-libs python36-devel python36-pip 
+
+RUN \
+    pip3.6 install --upgrade pip && \
+	pip3.6 install pymysql && \
+	pip3.6 install numpy && \
+	pip3.6 install scipy && \
+	pip3.6 install pandas && \
+    ln -s /usr/bin/python3.6 /usr/bin/python3 && \
 	echo "Python all installed" && \
 	yum -y install R R-Rcpp R-Rcpp-devel && \
 	yum -y install python-devel && \

@@ -1,0 +1,44 @@
+This is a Supercomputing Wales wrapper for the slurm simulator tools.
+
+# Workflow
+
+
+1. Create the necessary files with the command
+ ./script.py config
+ This command will perform the following steps:
+ 0. Start point - see config file:
+  a. A csv file with grant attributions and account names
+  b. A csv file, output from sacct, with historical job data.
+  c. A file containing a '|'-separated value description of all
+     the 'inital' qualities of service.
+  c. A date (included in the range of dates that the historical 
+     job data file span) where the simulation starts, and "history" 
+     ends
+  d. A saccmgr dump to modify - QOSes must be enabled for each 
+     account.
+  e. Names for the output files  
+  d. the 'c_n' coefficients in the priority formula
+ 
+ 1. New QOS are computed for each account which got some attributions.
+    2.1 New QOS are created - one per account
+    2.2 Priority levels are computed 
+    2.3 QOS_data.csv is modified accordingly
+ 
+ 2. QOS entries in the sacct_output are changed
+ 
+ 3. slurm.conf needs to be changed, allowing prioritised accounts 
+    to access the QOSes just created
+
+2.Create a tar archive with 
+ tar -cvf scw.tar QOS_data.csv sacct_output.csv sunbird.csv slurm.conf
+ Notice that the names  QOS_data.csv sacct_output.csv sunbird.csv
+ need to match the names of the output files in the 'config' file
+ that was passed to 'script.py'
+
+3.Start the simulator container
+4.Copy the scw.tar file into the simulator in the right position
+5.Start the simulator in the container 
+
+ # ISSUES
+ - Data about grants and accounts is messy for Swansea (Aberystwyth is much 
+   better)

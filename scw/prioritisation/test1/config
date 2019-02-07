@@ -1,0 +1,18 @@
+[INPUT]
+PrioritizedAccountFile = account_attributions.csv
+SacctOutputWide = sacct_output_all.csv
+QOSFile = QOS_data_original.csv
+DateStart= 2019-01-23T12:00:00
+SacctmgrDump = sunbird.cfg.manual
+
+[OUTPUT]
+SacctOutputCut = sacct_output.csv
+ModifiedQOSFileOutput = QOS_data.csv 
+SacctmgrDumpOutput = sunbird.cfg
+
+[CVALUES]
+compute = 0.02
+gpu = 0.04
+xcompute = 0.02
+xgpu = 0.04
+
