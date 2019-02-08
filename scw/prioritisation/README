@@ -4,7 +4,7 @@ This is a Supercomputing Wales wrapper for the slurm simulator tools.
 
 
 1. Create the necessary files with the command
- ./script.py config
+ ./prepare_run_files.py config
  This command will perform the following steps:
  0. Start point - see config file:
   a. A csv file with grant attributions and account names
