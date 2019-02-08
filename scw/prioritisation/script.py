@@ -82,12 +82,15 @@ for partition in partitions:
 
 
 # Condition A_t - sum_n c_n t_n > 0
+# Multplying priority it by 1000 because: 
+# - only the integer part will be accepted
+# - it will be normalised to the highest
 prioritized_accounts['PriorityBoost'] = False
 acpch = account_corehours_partitions['CoreHours']
 for account in prioritized_accounts.index:
     c_terms = [ cdict[partition]*acpch[account,partition] for partition in cdict if (account,partition) in acpch ]
     prioritized_accounts.loc[account,'PriorityBoost'] = \
-    np.log10(1+prioritized_accounts['Attribution'][account]) if\
+    int(1000*np.log10(1+prioritized_accounts['Attribution'][account])) if\
     len(c_terms) > 0 and sum(c_terms) > 0.0 else 0
 
 # Creating new QOSes as copies of the 'compute_default' one
