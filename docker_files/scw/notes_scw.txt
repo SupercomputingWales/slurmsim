@@ -40,7 +40,7 @@ CALL TREE
 
    B. run 2 commands - sacct and saccmgr - via ssh. 
 
-   See script for details.
+   See script 'slurm_conf_setup.sh' for details.
 
    RESUME OF POINT 2:
    2.0 Create scw.tar with files a., c. and d.
@@ -170,6 +170,8 @@ CSV field name     - sacct manual entry
 "cancelled_ts"     = ?? // From State and the End field
 #"freq"             = No meaning for slurm, only a check for examples in tutorials
 
+###############################################################################
+[This section should match what is written in the 'slurm_conf_setup.sh' script]
 
 Command used to retrieve data from slurm:
 
@@ -178,3 +180,6 @@ sacct --format JobIdRaw,Submit,Timelimit,End,Start,NTasks,NNodes,User,QOS,Partit
 Notice that starttime and endtime can be changed to select the period of
 interest.
 
+Also saccmgr must be queried, in order to get the QOS info. This is the command:
+
+sacctmgr list QOS --parsable2
