@@ -104,7 +104,7 @@ missing_ntasks_indices <- is.na(sacct_output$NTasks)
 sim_tasks <- as.integer(sacct_output$NTasks)
 sim_tasks[missing_ntasks_indices] <- as.integer(sacct_output$NCPUS[missing_ntasks_indices])
 
-sim_tasks_per_node <- as.integer(sim_tasks/as.integer(sacct_output$NNodes))
+sim_tasks_per_node <- as.integer(ceiling(sim_tasks/as.integer(sacct_output$NNodes)))
 sim_username <- as.character(sacct_output$User)
 sim_submit_ts <- sacct_output$Submit %>% ymd_hms %>% as.integer(.,unit='secs')
 sim_qosname <- sacct_output$QOS
