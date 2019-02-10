@@ -4,7 +4,8 @@ import numpy as np
 from sys import argv
 import matplotlib.pyplot as plt
 
-max_cpus=5040
+#max_cpus=(40*(136+26+13+26+3+1+1)) # HAWK
+max_cpus=5040 # SUNBIRD
 
 plt.figure(figsize=(8,7.0))
 for i,arg in enumerate(argv[1::2]):
@@ -30,7 +31,7 @@ for i,arg in enumerate(argv[1::2]):
     events.loc[events.Used < 0,'Used'] = 0
     events.loc[events.Used > max_cpus,'Used'] = max_cpus
     
-    plt.plot(events.Time,events.Used,label=argv[2+i*2])
+    plt.step(events.Time,events.Used,label=argv[2+i*2])
 
 
 
