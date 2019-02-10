@@ -3,19 +3,36 @@ import configparser
 from sys import argv
 import pandas as pd
 import numpy as np
+import argparse as ap
 import re
 
 # INPUT
 print(f"Reading {argv[1]}")
+
+parser = ap.ArgumentParser(
+        description = 'Prepare a number of files for the slurm simulator run')
+
+parser.add_argument("config",type=str,help="A configuration file containing \
+input/output file names and parameters.",required=True)
+parser.add_argument("--start",type=str,help="Start date for the simulation \
+(in a format that pandas.to_datatime can understand, e.g. 311218)",required=True)
+parser.add_argument("--end",type=str,help="End date for the simulation \
+(in a format that pandas.to_datatime can understand, e.g. 311218)",required=True)
+
+
+config_file = parser.config
+
 config = configparser.ConfigParser()
-config.read(argv[1])
-#config.read('config')
+config.read(config_file)
 
 input_config = config['INPUT']
 prioritized_accounts_file = input_config['PrioritizedAccountFile']
 sacct_output_wide = input_config['SacctOutputWide']
 qos_file_start = input_config['QOSFile']
-date_start = input_config['DateStart']
+
+date_start = parser.start
+date_end   = parser.end  
+
 sacctmgr_dump_file = input_config['SacctmgrDump']
 
 output_config = config['OUTPUT']
@@ -37,6 +54,7 @@ job_data = pd.read_csv(sacct_output_wide, sep='|')
 
 print(date_start)
 date_start = pd.to_datetime(date_start)
+date_end   = pd.to_datetime(date_end  )
 
 
 print(f"Reading {qos_file_start}")
@@ -109,7 +127,7 @@ QOS_data.to_csv(output_QOS, sep='|')
 
 # dropping created columns and creating a new object 
 job_data_output = job_data_cleaned.loc[
-    job_data_cleaned['End'] > date_start,: ].drop(['duration','CoreHours'],axis = 1 ).set_index('JobIDRaw')
+    (job_data_cleaned['End'] > date_start)&(job_data_cleaned['Start'] < date_end ),: ].drop(['duration','CoreHours'],axis = 1 ).set_index('JobIDRaw')
     
 # changing QOS in sacct_output.csv
 for account in prioritized_accounts.index:
