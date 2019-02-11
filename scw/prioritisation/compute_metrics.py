@@ -63,12 +63,25 @@ parser.add_argument(
 simulation results (e.g. 'jobcomp.log')",
     required=True)
 parser.add_argument(
-    "--prioritized_accounts",
+    "--pa",
     type=str,
     help="A file containing \
 a list of prioritized accounts.")
+parser.add_argument(
+    "--start",
+    type=str,
+    help="Start date for the computation of stats.",required=True)
+parser.add_argument(
+    "--end",
+    type=str,
+    help="End date for the computation of stas.",required=True)
+
+
 
 args = parser.parse_args()
+
+date_start = pd.to_datetime(args.start)
+date_end = pd.to_datetime(args.end)
 
 simulated_data = pd.read_csv(args.simresults, sep='|')
 
@@ -117,10 +130,14 @@ functions.append((quartiles, "(seconds) Upper and lower quartile "))
 # user sets
 datasets = []
 
+cut_condition = (simulated_data.Start > date_start ) & (simulated_data.End < date_end)
+
+simulated_data = simulated_data.loc[cut_condition,:]
+
 datasets.append((simulated_data, 'all'))
 # Prioritized and non-prioritized users
-if args.prioritized_accounts is not None:
-    with open(args.prioritized_accounts, 'r') as f:
+if args.pa is not None:
+    with open(args.pa, 'r') as f:
         prioritized_accounts = set(f.read().split()) - {''}
 
     simulated_data_prioritized = simulated_data.loc[
@@ -190,6 +207,8 @@ def keyname(func, dataset):
     d, dname = dataset
     return fname + 'queue time per job for ' + dname + 'users'
 
+maxl = max([len(keyname(func,dataset)) for func in functions 
+    for dataset in datasets])
 
 for func in functions:
     for dataset in datasets:
@@ -199,4 +218,4 @@ for func in functions:
 
         value = f(d)
         metrics[key] = value
-        print(key + ":" + str(value))
+        print(f"{key:<{maxl}}" + ":" + str(value))

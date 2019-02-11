@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 import configparser
-from sys import argv
 import pandas as pd
 import numpy as np
 import argparse as ap
 import re
 
 # INPUT
-print(f"Reading {argv[1]}")
 
 parser = ap.ArgumentParser(
         description = 'Prepare a number of files for the slurm simulator run')
@@ -23,6 +21,7 @@ parser.add_argument("--end",type=str,help="End date for the simulation \
 args = parser.parse_args()
 config_file = args.config
 
+print(f"Reading {config_file}")
 config = configparser.ConfigParser()
 config.read(config_file)
 
@@ -118,8 +117,8 @@ for account in prioritized_accounts.index:
 
 # setting up new QOSes
 for account in prioritized_accounts.index:
-    QOS_data.loc[account,'Priority'] = np.log10(
-        1.0 + prioritized_accounts['Attribution'][account])
+    QOS_data.loc[account,'Priority'] = int(1000*np.log10(
+        1.0 + prioritized_accounts['Attribution'][account]))
 
 # Saving the modified version of QOS_data
 print(f"Writing {output_QOS}")
