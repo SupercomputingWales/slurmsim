@@ -13,14 +13,15 @@ parser = ap.ArgumentParser(
         description = 'Prepare a number of files for the slurm simulator run')
 
 parser.add_argument("config",type=str,help="A configuration file containing \
-input/output file names and parameters.",required=True)
+input/output file names and parameters.")
 parser.add_argument("--start",type=str,help="Start date for the simulation \
 (in a format that pandas.to_datatime can understand, e.g. 311218)",required=True)
 parser.add_argument("--end",type=str,help="End date for the simulation \
 (in a format that pandas.to_datatime can understand, e.g. 311218)",required=True)
 
 
-config_file = parser.config
+args = parser.parse_args()
+config_file = args.config
 
 config = configparser.ConfigParser()
 config.read(config_file)
@@ -30,8 +31,8 @@ prioritized_accounts_file = input_config['PrioritizedAccountFile']
 sacct_output_wide = input_config['SacctOutputWide']
 qos_file_start = input_config['QOSFile']
 
-date_start = parser.start
-date_end   = parser.end  
+date_start = args.start
+date_end   = args.end  
 
 sacctmgr_dump_file = input_config['SacctmgrDump']
 

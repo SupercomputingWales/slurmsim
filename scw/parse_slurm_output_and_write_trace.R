@@ -132,9 +132,9 @@ sim_dependency <- factor(character(length(sim_job_id))) # empty
 sim_cancelled_ts <- integer(length(sim_job_id)) 
 cancelled_jobs_indices <- grepl('CANCELLED',sacct_output$State)
 
-sim_cancelled_ts[cancelled_jobs_indices] <- 
-    ( sacct_output$End[cancelled_jobs_indices]%>% ymd_hms)%>% 
-    as.integer(., units='secs')  
+#sim_cancelled_ts[cancelled_jobs_indices] <- 
+#   ( sacct_output$End[cancelled_jobs_indices]%>% ymd_hms)%>% 
+#   as.integer(., units='secs')  
 
 freq <- numeric(length(sim_job_id))
 
