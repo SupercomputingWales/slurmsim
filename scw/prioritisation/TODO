@@ -1,0 +1,15 @@
+- More statistics:
+  - How many users
+  - How many projects
+  - How many users in prioritised projects
+  - Total core hours in prioritised projects
+  - Reduction in queue time vs attribution
+
+- More testing:
+  - hawk!
+  - different values for c_n 
+  - different periods
+
+- Tweaks:
+  - understand how to clean logs... 
+
