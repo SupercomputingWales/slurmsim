@@ -11,5 +11,6 @@
   - different periods
 
 - Tweaks:
-  - understand how to clean logs... 
+  - understand how to clean logs...  
+    DONE - set SlurmctldDebug to 2 in slurm conf
 
