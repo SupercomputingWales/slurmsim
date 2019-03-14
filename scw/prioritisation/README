@@ -1,7 +1,11 @@
 This is a Supercomputing Wales wrapper for the slurm simulator tools.
+This directory contains
+1. a number of scripts that were/can be used to analyse and plot the
+results of the simulator against the original data coming from sacct
+2. a group of scripts that were/can be used to set up the simulation runs.
 
-# Workflow
 
+# Workflow for preparing a run (to study the prioritiation strategy)
 
 1. Create the necessary files with the command
  ./prepare_run_files.py config
