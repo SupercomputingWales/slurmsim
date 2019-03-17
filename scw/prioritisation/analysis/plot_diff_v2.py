@@ -52,14 +52,17 @@ print(date_end)
 join = first.join(second.set_index('JobIDRaw'),
         on='JobIDRaw',lsuffix='_first',rsuffix='_second',how='right')
 
+# conversions to datetime
 join.loc[:,'Start_first'] = pd.to_datetime(join['Start_first'])
 join.loc[:,'Start_second'] = pd.to_datetime(join['Start_second'])
 join.loc[:,'End_first'] = pd.to_datetime(join['End_first'])
 join.loc[:,'End_second'] = pd.to_datetime(join['End_second'])
 join.loc[:,'Submit_first'] = pd.to_datetime(join['Submit_first'])
+# deltas
 join.loc[:,'Delta_Start'] = join['Start_second']-join['Start_first']
-join.loc[:,'Delta_Start'] = join['Delta_Start'].astype('timedelta64[s]')
 join.loc[:,'Wait_first'] = join['Start_first'] - join['Submit_first']
+# conversion to numbers
+join.loc[:,'Delta_Start'] = join['Delta_Start'].astype('timedelta64[s]')
 join.loc[:,'Wait_first'] = join['Wait_first'].astype('timedelta64[s]')
 
 cut_condition = (join.Start_first > date_start ) & (join.End_first < date_end )
