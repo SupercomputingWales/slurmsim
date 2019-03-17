@@ -72,20 +72,21 @@ parser.add_argument(
 parser.add_argument(
     "--start",
     type=str,
-    help="Start date for the computation of stats.",required=True)
+    help="Start date for the computation of stats (Format DDMMYY).",required=True)
 parser.add_argument(
     "--end",
     type=str,
-    help="End date for the computation of stats.",required=True)
+    help="End date for the computation of stats (Format DDMMYY).",required=True)
 
 
 
 args = parser.parse_args()
 
-date_start = pd.to_datetime(args.start)
-date_end = pd.to_datetime(args.end)
+date_start = pd.to_datetime(args.start,format="%d%m%y")
+date_end = pd.to_datetime(args.end,format="%d%m%y")
 
 simulated_data = pd.read_csv(args.simresults, sep='|')
+print(f"[DEBUG] Nuber of job in {args.simresults}: {len(simulated_data)}")
 
 # Transforming column formats for convenience
 column_names_to_datetime = {'Submit', 'Eligible', 'Start', 'End'}
@@ -143,13 +144,18 @@ datasets = []
 
 cut_condition = (simulated_data.Start > date_start ) & (simulated_data.End < date_end)
 
+print(f"[DEBUG] Min date: {simulated_data.Submit.min()}")
+print(f"[DEBUG] Max date: {simulated_data.End.max()}")
+print(f"[DEBUG] Analysis Date interval: {date_start}-{date_end}")
 simulated_data = simulated_data.loc[cut_condition,:]
+
+print(f"[DEBUG] Nuber of job in {args.simresults} between selected dates: {len(simulated_data)}")
 
 datasets.append((simulated_data, 'all'))
 # Prioritized and non-prioritized users
 if args.pa is not None:
     with open(args.pa, 'r') as f:
-        prioritized_accounts = [l.strip() for l set(f.read().split()) if l != '']
+        prioritized_accounts = [l.strip() for l in set(f.read().split()) if l != '']
 
     simulated_data_prioritized = simulated_data.loc[
             [acc in prioritized_accounts for acc in simulated_data.Account], :]

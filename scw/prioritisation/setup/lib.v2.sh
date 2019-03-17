@@ -1,7 +1,9 @@
 
 BASE_IMAGE=sunbird4
 SCRIPTS_DIR=/home/michele/slurm_sim_analysis/setup
-LIST_OF_SIMULATIONS=starts_ends_qosps.txt
+ANALYSIS_SCRIPTS_DIR=/home/michele/slurm_sim_analysis/analysis
+LIST_OF_SIMULATIONS=cycle_data.txt
+PACKAGE=../package
 
 mdirname(){
   START=$1
@@ -53,15 +55,15 @@ remove(){
  
 cycle(){
 FUN=$1
-while read START END QOSP
+while read START END QOSP OTHER
 do
     DIR=$(mdirname $START $END $QOSP)
     echo "Cycling on dir $DIR"
     mkdir -p $DIR
     cd $DIR
-    $FUN $START $END $QOSP 
+    $FUN $START $END $QOSP  $OTHER
     cd -
-done < <(sed 's/#.*$//' $LIST_OF_SIMULATIONS | awk '(NF==3){print $0}')
+done < <(sed 's/#.*$//' $LIST_OF_SIMULATIONS | awk '(NF>=3){print $0}')
 
 
 }
@@ -69,17 +71,16 @@ done < <(sed 's/#.*$//' $LIST_OF_SIMULATIONS | awk '(NF==3){print $0}')
 cycle_async(){
 FUN=$1
 WAIT=$2 # optional
-while read START END QOSP
+while read START END QOSP OTHER
 do
     DIR=$(mdirname $START $END $QOSP)
     echo "Cycling on dir $DIR"
     mkdir -p $DIR
     cd $DIR
-    $FUN $START $END $QOSP &
+    $FUN $START $END $QOSP $OTHER &
     $WAIT
     cd -
-done < <(sed 's/#.*$//' $LIST_OF_SIMULATIONS | awk '(NF==3){print $0}')
-
+done < <(sed 's/#.*$//' $LIST_OF_SIMULATIONS | awk '(NF>=3){print $0}')
 
 }
 
@@ -101,7 +102,7 @@ prepare_run_files(){
   END=$2
   QOSP=$3
 
-  $SCRIPTS_DIR/prepare_run_files.v2.py ../package/config.v2 --start $START --end $END --newqosprio $QOSP
+  $SCRIPTS_DIR/prepare_run_files.v2.py $PACKAGE/config.v2 --start $START --end $END --newqosprio $QOSP
 
 }
 
@@ -151,6 +152,17 @@ get_data_out(){
   docker cp $CONTAINER_NAME:/home/slurm/slurm_sim_ws/slurm_sim_tools/scw/test_trace.csv ./
 
 }
+
+analyse(){
+  QOSP=$3
+  ANALYSIS_START=$4
+  ANALYSIS_END=$5
+  $ANALYSIS_SCRIPTS_DIR/compute_metrics.py --simresult jobcomp.log \
+      --start $ANALYSIS_START --end $ANALYSIS_END --pa  $PACKAGE/prioritised_accounts.txt > metrics.txt
+
+}
+ 
+
 
 check_job_number(){
 
