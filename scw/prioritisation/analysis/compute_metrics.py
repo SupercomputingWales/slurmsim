@@ -71,13 +71,15 @@ def fix_dataframe(simulated_data):
 
 # Functions for metrics
 functions = []
+funnames_short_to_long = dict()
 
 
 def avgwait(df):
     return (df.Start - df.Submit).mean()
 
-fname_long = "Average " + 'queue time per job for '
 fname = "Avgqt"
+fname_long = "Average " + 'queue time per job for '
+funnames_short_to_long[fname] = fname_long
 functions.append((avgwait, fname))
 
 
@@ -85,8 +87,9 @@ def maxwait(df):
     return (df.Start - df.Submit).max()
 
 
-fname_log = "Maximum " + 'queue time per job for '
 fname = "Maxqt"
+fname_log = "Maximum " + 'queue time per job for '
+funnames_short_to_long[fname] = fname_long
 functions.append((maxwait, fname))
 
 def lower_quartile(df):
@@ -94,8 +97,9 @@ def lower_quartile(df):
     q25 = np.percentile(arr, q=25).astype('timedelta64[s]')
     return pd.to_timedelta(q25,'s')
 
-fname_long = "(seconds) Lower quartile " + 'queue time per job for '
 fname = "q25qt"
+fname_long = "(seconds) Lower quartile " + 'queue time per job for '
+funnames_short_to_long[fname] = fname_long
 functions.append((lower_quartile, fname))
 
 def upper_quartile(df):
@@ -104,19 +108,25 @@ def upper_quartile(df):
     return pd.to_timedelta(q75,'s')
 
 
-fname_long = "(seconds) Upper quartile " + 'queue time per job for '
 fname = "q75qt"
+fname_long = "(seconds) Upper quartile " + 'queue time per job for '
+funnames_short_to_long[fname] = fname_long
 functions.append((upper_quartile, fname))
 
 def corehours(df):
     s = df.Elapsed.astype('timedelta64[h]')*df.NCPUS
     return s.sum()
 
-fname_long = "Total Core Hours "
 fname = "TCH"
+fname_long = "Total Core Hours "
+funnames_short_to_long[fname] = fname_long
 functions.append((corehours, fname))
 
 # user sets
+ds_short_to_long = {'pr':'prioritised',
+                   'no-pr':'non prioritised',
+                   'lt':'"long tail"'}
+
 def prepare_datasets(simulated_data,date_start,date_end,prioritized_accounts):
     datasets = []
     
@@ -189,19 +199,34 @@ def prepare_datasets(simulated_data,date_start,date_end,prioritized_accounts):
 #print("Long-tail users:")
 #print(long_tail_users)
 
-# Calculating metrics
+def keyname(func, dataset):
+    f, fname = func
+    d, dname = dataset
+    return fname + dname 
 
+def keyname_long(func, dataset):
+    f, fname = func
+    d, dname = dataset
+    fname = funnames_short_to_long[fname]
+    dname = ds_short_to_long[dname]
+    return ' '.join([fname,dname,'user'])
+
+
+short_to_long = dict()
+
+for func in functions:
+   for dataset in [(None,'pr'),(None,'no-pr'),(None,'lt')]:
+       short_name = keyname(func, dataset)
+       long_name  = keyname_long(func, dataset)
+       short_to_long[short_name] = long_name
+   
+ 
+# Calculating metrics
 
 def calc_metrics(simulated_data, date_start, date_end,prioritized_accounts):
     metrics = dict()
     
-    def keyname(func, dataset):
-        f, fname = func
-        d, dname = dataset
-        return fname + dname 
-    
     datasets = prepare_datasets(simulated_data, date_start,date_end, prioritized_accounts)
-    
     
     for func in functions:
         for dataset in datasets:
