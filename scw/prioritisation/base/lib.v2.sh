@@ -159,6 +159,9 @@ analyse(){
   ANALYSIS_END=$5
   $ANALYSIS_SCRIPTS_DIR/compute_metrics.py --simresult jobcomp.log \
       --start $ANALYSIS_START --end $ANALYSIS_END --pa  $PACKAGE/prioritised_accounts.txt > metrics.txt
+  $ANALYSIS_SCRIPTS_DIR/compute_metrics.py --simresult sacct_output.csv \
+      --start $ANALYSIS_START --end $ANALYSIS_END --pa  $PACKAGE/prioritised_accounts.txt > original_metrics.txt
+
 
 }
  
