@@ -74,7 +74,7 @@ functions_for_cart_product = []
 funnames_short_to_long = dict()
 
 
-def avgwait(df):
+def avgwait(df,starttime,endtime):
     return (df.Start - df.Submit).mean()
 
 fname = "Avgqt"
@@ -83,7 +83,7 @@ funnames_short_to_long[fname] = fname_long
 functions_for_cart_product.append((avgwait, fname))
 
 
-def maxwait(df):
+def maxwait(df,starttime,endtime):
     return (df.Start - df.Submit).max()
 
 
@@ -92,7 +92,7 @@ fname_log = "Maximum " + 'queue time per job for '
 funnames_short_to_long[fname] = fname_long
 functions_for_cart_product.append((maxwait, fname))
 
-def lower_quartile(df):
+def lower_quartile(df,starttime,endtime):
     arr = (df.Start - df.Submit).astype('timedelta64[s]')
     q25 = np.percentile(arr, q=25).astype('timedelta64[s]')
     return pd.to_timedelta(q25,'s')
@@ -102,7 +102,7 @@ fname_long = "(seconds) Lower quartile " + 'queue time per job for '
 funnames_short_to_long[fname] = fname_long
 functions_for_cart_product.append((lower_quartile, fname))
 
-def upper_quartile(df):
+def upper_quartile(df,starttime,endtime):
     arr = (df.Start - df.Submit)
     q75 = np.percentile(arr, q=75).astype('timedelta64[s]')
     return pd.to_timedelta(q75,'s')
@@ -113,8 +113,13 @@ fname_long = "(seconds) Upper quartile " + 'queue time per job for '
 funnames_short_to_long[fname] = fname_long
 functions_for_cart_product.append((upper_quartile, fname))
 
-def corehours(df):
+def corehours(df,starttime,endtime):
     s = df.Elapsed.astype('timedelta64[h]')*df.NCPUS
+    crop = df.loc[:,['Start','End']].copy()
+    crop.loc[crop.Start < starttime,'Start'] = starttime
+    crop.loc[crop.End   > endtime,'End'] = endtime
+    cropped_elapsed = crop.End - crop.Start
+    s = cropped_elapsed.astype('timedelta64[h]')*df.NCPUS
     return s.sum()
 
 fname = "TCH"
@@ -135,7 +140,8 @@ ds_short_to_long = {'pr':'prioritised',
 def prepare_datasets(simulated_data,date_start,date_end,prioritized_accounts):
     datasets = []
     
-    cut_condition = (simulated_data.Start > date_start ) & (simulated_data.End < date_end)
+    #cut_condition = (simulated_data.Start > date_start ) & (simulated_data.End < date_end)
+    cut_condition = (simulated_data.End   > date_start ) & (simulated_data.Start < date_end)
     
     print(f"[DEBUG] Min date: {simulated_data.Submit.min()}")
     print(f"[DEBUG] Max date: {simulated_data.End.max()}")
@@ -240,7 +246,7 @@ def calc_metrics(simulated_data, date_start, date_end,prioritized_accounts,totnc
             d, dname = dataset
             key = keyname(func, dataset)
     
-            value = f(d)
+            value = f(d,date_start,date_end)
             metrics[key] = value
 
     metrics['TotCHAvail'] = tot_core_hours_available(date_start,date_end,totncpus)

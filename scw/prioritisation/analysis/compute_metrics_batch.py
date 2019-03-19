@@ -17,7 +17,11 @@ def clear_text(filename):
     with open(filename,'r') as f:
         lines = f.readlines()
         cleared_lines = [ clear_line(line) for line in lines ]
-        text = '\n'.join([ ','.join(clear_line(line).split()) for line in cleared_lines if len(line) != 1 ])
+        good_lines = [ ','.join(clear_line(line).split()) for line in cleared_lines if len(line) != 1 ]
+        print(f"[DEBUG] No of good lines: {len(good_lines)}")
+        header = ','.join(['SimulationStart','SimulationEnd',
+        'PriorityWeightQOS','AnalysisStart','AnalysisEnd'])
+        text = '\n'.join([header]+good_lines)
         while '\n\n' in text:
             text = text.replace('\n\n','\n')
         
@@ -25,9 +29,7 @@ def clear_text(filename):
 
 def read_cycle_info_file(filename):
     settings_table = pd.read_csv(StringIO(clear_text(filename)),dtype=str)
-    settings_table.columns = ['SimulationStart','SimulationEnd',
-        'PriorityWeightQOS','AnalysisStart','AnalysisEnd']
-   
+  
     return settings_table
 
 def dirname(SimulationStart,SimulationEnd,PriorityWeightQOS):
@@ -61,15 +63,17 @@ def analyse_all_from_table(settings_table, prioritized_accounts,totncpus):
          AnalysisStart   = pd.to_datetime(AnalysisStart  ,format = '%d%m%y')
          AnalysisEnd     = pd.to_datetime(AnalysisEnd    ,format = '%d%m%y')
  
-         metrics[(SimulationStart, SimulationEnd, PriorityWeightQOS)] = \
+         metrics[(AnalysisStart, AnalysisEnd, PriorityWeightQOS)] = \
              cm.calc_metrics(simulated_data,AnalysisStart,AnalysisEnd,prioritized_accounts,totncpus)
 
     return metrics
 
+metrics_df_index_names = ['AnalysisStart','AnalysisEnd','QOSPriority']
+
 def make_metrics_df(metrics):
 
-    met_df = pd.DataFrame(columns= ['RunStart','RunEnd','QOSPriority'] + 
-         list(list(metrics.values())[0].keys())).set_index(['RunStart','RunEnd','QOSPriority'])
+    met_df = pd.DataFrame(columns=  metrics_df_index_names + 
+         list(list(metrics.values())[0].keys())).set_index(metrics_df_index_names)
 
     for k,v in metrics.items():
         for k2,v2 in v.items():
