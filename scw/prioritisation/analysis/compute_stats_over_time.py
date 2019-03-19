@@ -86,6 +86,9 @@ for i, arg in enumerate(files_and_labels[0::2]):
 
     fix_timelimit(data_all)
 
+    rows_to_forget = (data_all.Start.str.match('Unknown')) | \
+            (data_all.End.str.match('Unknown'))
+    data_all = data_all.loc[~rows_to_forget,:]
     data_all.Start = pd.to_datetime(data_all.Start)
     data_all.End = pd.to_datetime(data_all.End)
 
