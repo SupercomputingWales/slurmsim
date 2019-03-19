@@ -149,7 +149,6 @@ for i, arg in enumerate(files_and_labels[0::2]):
 
         plt.figure(3)
         plt.step(NJobs.index, NJobs, label=label, color=p.get_color(), where = 'post')
-        print(NJobs)
 
 for i, label in [(1, 'Utilisation (%)'), (2, 'Queeue - Core hours'),
                  (3, 'Queue - Job Number')]:
