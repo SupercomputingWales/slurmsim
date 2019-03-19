@@ -98,7 +98,7 @@ def lower_quartile(df,starttime,endtime):
     return pd.to_timedelta(q25,'s')
 
 fname = "q25qt"
-fname_long = "(seconds) Lower quartile " + 'queue time per job for '
+fname_long = "Lower quartile " + 'queue time per job for '
 funnames_short_to_long[fname] = fname_long
 functions_for_cart_product.append((lower_quartile, fname))
 
@@ -109,7 +109,7 @@ def upper_quartile(df,starttime,endtime):
 
 
 fname = "q75qt"
-fname_long = "(seconds) Upper quartile " + 'queue time per job for '
+fname_long = "Upper quartile " + 'queue time per job for '
 funnames_short_to_long[fname] = fname_long
 functions_for_cart_product.append((upper_quartile, fname))
 
@@ -133,7 +133,8 @@ def tot_core_hours_available(date_start,date_end,totncpus):
 
 
 # user sets
-ds_short_to_long = {'pr':'prioritised',
+ds_short_to_long = {'all':'all',
+                   'pr':'prioritised',
                    'no-pr':'non prioritised',
                    'lt':'"long tail"'}
 
@@ -220,7 +221,7 @@ def keyname_long(func, dataset):
     d, dname = dataset
     fname = funnames_short_to_long[fname]
     dname = ds_short_to_long[dname]
-    return ' '.join([fname,dname,'user'])
+    return ' '.join([fname,dname,'users'])
 
 
 short_to_long = dict()
