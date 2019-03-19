@@ -70,7 +70,7 @@ def fix_dataframe(simulated_data):
 # COMPUTING METRICS
 
 # Functions for metrics
-functions = []
+functions_for_cart_product = []
 funnames_short_to_long = dict()
 
 
@@ -80,7 +80,7 @@ def avgwait(df):
 fname = "Avgqt"
 fname_long = "Average " + 'queue time per job for '
 funnames_short_to_long[fname] = fname_long
-functions.append((avgwait, fname))
+functions_for_cart_product.append((avgwait, fname))
 
 
 def maxwait(df):
@@ -90,7 +90,7 @@ def maxwait(df):
 fname = "Maxqt"
 fname_log = "Maximum " + 'queue time per job for '
 funnames_short_to_long[fname] = fname_long
-functions.append((maxwait, fname))
+functions_for_cart_product.append((maxwait, fname))
 
 def lower_quartile(df):
     arr = (df.Start - df.Submit).astype('timedelta64[s]')
@@ -100,7 +100,7 @@ def lower_quartile(df):
 fname = "q25qt"
 fname_long = "(seconds) Lower quartile " + 'queue time per job for '
 funnames_short_to_long[fname] = fname_long
-functions.append((lower_quartile, fname))
+functions_for_cart_product.append((lower_quartile, fname))
 
 def upper_quartile(df):
     arr = (df.Start - df.Submit)
@@ -111,7 +111,7 @@ def upper_quartile(df):
 fname = "q75qt"
 fname_long = "(seconds) Upper quartile " + 'queue time per job for '
 funnames_short_to_long[fname] = fname_long
-functions.append((upper_quartile, fname))
+functions_for_cart_product.append((upper_quartile, fname))
 
 def corehours(df):
     s = df.Elapsed.astype('timedelta64[h]')*df.NCPUS
@@ -120,7 +120,12 @@ def corehours(df):
 fname = "TCH"
 fname_long = "Total Core Hours "
 funnames_short_to_long[fname] = fname_long
-functions.append((corehours, fname))
+functions_for_cart_product.append((corehours, fname))
+
+# THIS MUST BE ADDED BY HAND
+def tot_core_hours_available(date_start,date_end,totncpus):
+    return (date_end - date_start).total_seconds()/3600 * totncpus
+
 
 # user sets
 ds_short_to_long = {'pr':'prioritised',
@@ -214,21 +219,22 @@ def keyname_long(func, dataset):
 
 short_to_long = dict()
 
-for func in functions:
+for func in functions_for_cart_product:
    for dataset in [(None,'pr'),(None,'no-pr'),(None,'lt')]:
        short_name = keyname(func, dataset)
        long_name  = keyname_long(func, dataset)
        short_to_long[short_name] = long_name
-   
+
+short_to_long['TotCHAvail']  = "Total core hours available"
  
 # Calculating metrics
 
-def calc_metrics(simulated_data, date_start, date_end,prioritized_accounts):
+def calc_metrics(simulated_data, date_start, date_end,prioritized_accounts,totncpus):
     metrics = dict()
     
     datasets = prepare_datasets(simulated_data, date_start,date_end, prioritized_accounts)
     
-    for func in functions:
+    for func in functions_for_cart_product:
         for dataset in datasets:
             f, fname = func
             d, dname = dataset
@@ -236,6 +242,9 @@ def calc_metrics(simulated_data, date_start, date_end,prioritized_accounts):
     
             value = f(d)
             metrics[key] = value
+
+    metrics['TotCHAvail'] = tot_core_hours_available(date_start,date_end,totncpus)
+    print(f"[DEBUG] Total core hours available: {metrics['TotCHAvail']}")
     
     return metrics
 
@@ -272,6 +281,13 @@ if __name__ == "__main__":
         "--end",
         type=str,
         help="End date for the computation of stats (Format DDMMYY).",required=True)
+
+    parser.add_argument(
+        "--totncpus",
+        type=int,
+        help="Number of CPUS in the cluster (to compute total core hours availability).",
+        required=False,
+        default = 126*40) # default : sunbird
     
     args = parser.parse_args()
     
@@ -285,7 +301,7 @@ if __name__ == "__main__":
 
     prioritized_accounts = get_palist(args.pa)
 
-    metrics = calc_metrics(simulated_data,date_start,date_end,prioritized_accounts)
+    metrics = calc_metrics(simulated_data,date_start,date_end,prioritized_accounts,args.totncpus)
 
     maxl = max([len(k) for k in metrics.keys()])
 

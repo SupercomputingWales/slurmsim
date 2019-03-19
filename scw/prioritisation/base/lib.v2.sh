@@ -2,7 +2,8 @@
 BASE_IMAGE=sunbird4
 SCRIPTS_DIR=/home/michele/slurm_sim_analysis/setup
 ANALYSIS_SCRIPTS_DIR=/home/michele/slurm_sim_analysis/analysis
-LIST_OF_SIMULATIONS=cycle_data.txt
+LIST_OF_SIMULATIONS=cycle_data_nolinks.txt
+LIST_OF_SIMULATIONS_FOR_ANALYSIS=cycle_data_analysis.txt
 PACKAGE=../package
 
 mdirname(){
@@ -68,22 +69,20 @@ done < <(sed 's/#.*$//' $LIST_OF_SIMULATIONS | awk '(NF>=3){print $0}')
 
 }
  
-cycle_async(){
-FUN=$1
-WAIT=$2 # optional
+cycle_analyse(){
+FUN=analyse
 while read START END QOSP OTHER
 do
     DIR=$(mdirname $START $END $QOSP)
     echo "Cycling on dir $DIR"
     mkdir -p $DIR
     cd $DIR
-    $FUN $START $END $QOSP $OTHER &
-    $WAIT
+    $FUN $START $END $QOSP  $OTHER
     cd -
-done < <(sed 's/#.*$//' $LIST_OF_SIMULATIONS | awk '(NF>=3){print $0}')
+done < <(sed 's/#.*$//' $LIST_OF_SIMULATIONS_FOR_ANALYSIS | awk '(NF>=3){print $0}')
+
 
 }
-
 wait_for_ps_to_be_less_than_10(){
 
    echo 'Waiting a bit anyway...'

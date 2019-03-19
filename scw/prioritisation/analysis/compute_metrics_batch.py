@@ -37,7 +37,7 @@ simres_basename = 'jobcomp.log'
 original_res_basename = 'sacct_output.csv'
 
 
-def analyse_all_from_table(settings_table, prioritized_accounts):
+def analyse_all_from_table(settings_table, prioritized_accounts,totncpus):
  
     metrics = dict()
     for SimulationStart, SimulationEnd, PriorityWeightQOS, AnalysisStart, AnalysisEnd in zip(
@@ -62,7 +62,7 @@ def analyse_all_from_table(settings_table, prioritized_accounts):
          AnalysisEnd     = pd.to_datetime(AnalysisEnd    ,format = '%d%m%y')
  
          metrics[(SimulationStart, SimulationEnd, PriorityWeightQOS)] = \
-             cm.calc_metrics(simulated_data,AnalysisStart,AnalysisEnd,prioritized_accounts)
+             cm.calc_metrics(simulated_data,AnalysisStart,AnalysisEnd,prioritized_accounts,totncpus)
 
     return metrics
 
@@ -87,16 +87,26 @@ if __name__ == "__main__":
     parser.add_argument("--pa",type=str,
         help="A file containing a list of prioritized accounts.")
 
+    parser.add_argument(
+        "--totncpus",
+        type=int,
+        help="Number of CPUS in the cluster (to compute total core hours availability).",
+        required=False,
+        default = 126*40) # default : sunbird
+    
+
     args = parser.parse_args()
    
     settings_table = read_cycle_info_file(args.cycle_data)
 
     prioritized_accounts = cm.get_palist(args.pa)
    
-    metrics = cmb.analyse_all_from_table(settings_table,prioritized_accounts)
+    metrics = analyse_all_from_table(settings_table,prioritized_accounts,args.totncpus)
 
-    met_df = cmb.make_metrics_df(metrics)
+    met_df = make_metrics_df(metrics)
    
+    met_df.to_csv('all_metrics.csv',sep='\t')
+    met_df.to_pickle('all_metrics.pickle')
 
 
 
