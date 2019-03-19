@@ -226,7 +226,7 @@ def keyname_long(func, dataset):
 short_to_long = dict()
 
 for func in functions_for_cart_product:
-   for dataset in [(None,'pr'),(None,'no-pr'),(None,'lt')]:
+   for dataset in [(None,'all'),(None,'pr'),(None,'no-pr'),(None,'lt')]:
        short_name = keyname(func, dataset)
        long_name  = keyname_long(func, dataset)
        short_to_long[short_name] = long_name
