@@ -10,6 +10,8 @@ pandas = "*"
 numpy = "*"
 more-itertools = "*"
 ipython = "*"
+matplotlib = "*"
+yapf = "*"
 
 [requires]
 python_version = "3.6"
