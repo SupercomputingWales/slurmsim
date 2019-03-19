@@ -63,15 +63,17 @@ def analyse_all_from_table(settings_table, prioritized_accounts,totncpus):
          AnalysisStart   = pd.to_datetime(AnalysisStart  ,format = '%d%m%y')
          AnalysisEnd     = pd.to_datetime(AnalysisEnd    ,format = '%d%m%y')
  
-         metrics[(SimulationStart, SimulationEnd, PriorityWeightQOS)] = \
+         metrics[(AnalysisStart, AnalysisEnd, PriorityWeightQOS)] = \
              cm.calc_metrics(simulated_data,AnalysisStart,AnalysisEnd,prioritized_accounts,totncpus)
 
     return metrics
 
+metrics_df_index_names = ['AnalysisStart','AnalysisEnd','QOSPriority']
+
 def make_metrics_df(metrics):
 
-    met_df = pd.DataFrame(columns= ['RunStart','RunEnd','QOSPriority'] + 
-         list(list(metrics.values())[0].keys())).set_index(['RunStart','RunEnd','QOSPriority'])
+    met_df = pd.DataFrame(columns=  metrics_df_index_names + 
+         list(list(metrics.values())[0].keys())).set_index(metrics_df_index_names)
 
     for k,v in metrics.items():
         for k2,v2 in v.items():
