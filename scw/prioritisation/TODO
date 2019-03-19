@@ -4,13 +4,17 @@
   - How many users in prioritised projects
   - Total core hours in prioritised projects
   - Reduction in queue time vs attribution
+    THE LINK SEEMS NOT TO EASY TO SEE
 
 - More testing:
   - hawk!
   - different values for c_n 
-  - different periods
+  - different periods 
+    DONE - We have 10 different periods
 
 - Tweaks:
   - understand how to clean logs...  
     DONE - set SlurmctldDebug to 2 in slurm conf
 
+- Plots:
+  - stats over time in batch.
