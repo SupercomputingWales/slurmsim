@@ -140,7 +140,8 @@ ds_short_to_long = {'pr':'prioritised',
 def prepare_datasets(simulated_data,date_start,date_end,prioritized_accounts):
     datasets = []
     
-    cut_condition = (simulated_data.Start > date_start ) & (simulated_data.End < date_end)
+    #cut_condition = (simulated_data.Start > date_start ) & (simulated_data.End < date_end)
+    cut_condition = (simulated_data.End   > date_start ) & (simulated_data.Start < date_end)
     
     print(f"[DEBUG] Min date: {simulated_data.Submit.min()}")
     print(f"[DEBUG] Max date: {simulated_data.End.max()}")
