@@ -56,16 +56,38 @@ import argparse as ap
 import numpy as np
 
 # Parsing arguments
+def fix_timelimit(data):
+    '''
+    Fixes timelimit in a dataframe, in place.
+    '''
+    max_timelimit_string = "3d00:00:00"
+    data.loc[data.Timelimit.str.match('Partition_Limit'
+                                      ), 'Timelimit'] = max_timelimit_string
+    data.Timelimit = data.Timelimit.str.replace('-', 'd')
+    data.Timelimit = pd.to_timedelta(data.Timelimit)
+    data.loc[data.Timelimit > pd.to_timedelta(max_timelimit_string),
+             'Timelimit'] = pd.to_timedelta(max_timelimit_string)
+
+    return data
+
 # Transforming column formats for convenience
 def fix_dataframe(simulated_data):
+    rows_to_forget = (simulated_data.Start.str.match('Unknown')) | \
+            (simulated_data.End.str.match('Unknown'))
+    simulated_data = simulated_data.loc[~rows_to_forget,:]
+
+    simulated_data = fix_timelimit(simulated_data)
+
     column_names_to_datetime = {'Submit', 'Eligible', 'Start', 'End'}
     
     for colname in column_names_to_datetime.intersection(set(simulated_data.columns)):
-        simulated_data[colname] = pd.to_datetime(simulated_data[colname])
+        simulated_data.loc[:,colname] = pd.to_datetime(simulated_data[colname])
     
     # Pandas cannot properly parse this column, but it is equal to End-Start,
     # so we substitute it.
-    simulated_data['Elapsed'] = simulated_data.End - simulated_data.Start
+    simulated_data.loc[:,'Elapsed'] = simulated_data.End - simulated_data.Start
+
+    return simulated_data
 
 # COMPUTING METRICS
 
@@ -88,7 +110,7 @@ def maxwait(df,starttime,endtime):
 
 
 fname = "Maxqt"
-fname_log = "Maximum " + 'queue time per job for '
+fname_long = "Maximum " + 'queue time per job for '
 funnames_short_to_long[fname] = fname_long
 functions_for_cart_product.append((maxwait, fname))
 
@@ -138,9 +160,7 @@ ds_short_to_long = {'all':'all',
                    'no-pr':'non prioritised',
                    'lt':'"long tail"'}
 
-def prepare_datasets(simulated_data,date_start,date_end,prioritized_accounts):
-    datasets = []
-    
+def crop_dataset(simulated_data,date_start,date_end):
     #cut_condition = (simulated_data.Start > date_start ) & (simulated_data.End < date_end)
     cut_condition = (simulated_data.End   > date_start ) & (simulated_data.Start < date_end)
     
@@ -150,6 +170,13 @@ def prepare_datasets(simulated_data,date_start,date_end,prioritized_accounts):
     simulated_data = simulated_data.loc[cut_condition,:].copy()
     
     print(f"[DEBUG] Nuber of job in dataframe between selected dates: {len(simulated_data)}")
+    return simulated_data
+ 
+
+def prepare_datasets(simulated_data,date_start,date_end,prioritized_accounts):
+    datasets = []
+
+    simulated_data = crop_dataset(simulated_data,date_start,date_end)
     
     datasets.append((simulated_data, 'all'))
     if prioritized_accounts is not None:
@@ -304,8 +331,8 @@ if __name__ == "__main__":
     simulated_data = pd.read_csv(args.simresults, sep='|')
     print(f"[DEBUG] Nuber of job in {args.simresults}: {len(simulated_data)}")
 
-    fix_dataframe(simulated_data)
-
+    simulated_data = fix_dataframe(simulated_data)
+ 
     prioritized_accounts = get_palist(args.pa)
 
     metrics = calc_metrics(simulated_data,date_start,date_end,prioritized_accounts,args.totncpus)
