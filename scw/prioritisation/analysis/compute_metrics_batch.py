@@ -9,7 +9,10 @@ import batch_lib as bl
 
 
 
-def analyse_all_from_table(settings_table, prioritized_accounts,totncpus):
+def analyse_all_from_table(settings_table, 
+        prioritized_accounts,
+        totncpus,
+        data_prefix):
  
     metrics = dict()
     for SimulationStart, SimulationEnd, PriorityWeightQOS, AnalysisStart, AnalysisEnd in zip(
@@ -19,9 +22,11 @@ def analyse_all_from_table(settings_table, prioritized_accounts,totncpus):
             settings_table.AnalysisStart,
             settings_table.AnalysisEnd):
         
-         simres_name = os.path.join(bl.dirname(SimulationStart, SimulationEnd, PriorityWeightQOS),
+         simres_name = os.path.join(data_prefix,
+                 bl.dirname(SimulationStart, SimulationEnd, PriorityWeightQOS),
 		bl.simres_basename)
 
+         print(f"Reading {simres_name}")
          simulated_data = pd.read_csv(simres_name,sep='|')
          print(f"[DEBUG] Nuber of job in {simres_name}: {len(simulated_data)}")
     
@@ -67,20 +72,34 @@ if __name__ == "__main__":
         help="Number of CPUS in the cluster (to compute total core hours availability).",
         required=False,
         default = 126*40) # default : sunbird
-    
 
+    parser.add_argument(
+        "--data_prefix",
+        type=str,
+        help="Path prefix to where the directories containing the data are."
+        required=True)
+    
     args = parser.parse_args()
    
     settings_table = bl.read_cycle_info_file(args.cycle_data)
 
     prioritized_accounts = cm.get_palist(args.pa)
+
+    data_prefix =parser.data_prefix
    
-    metrics = analyse_all_from_table(settings_table,prioritized_accounts,args.totncpus)
+    metrics = analyse_all_from_table(settings_table,
+            prioritized_accounts,
+            args.totncpus,
+            data_prefix)
 
     met_df = make_metrics_df(metrics)
-   
-    met_df.to_csv('all_metrics.csv',sep='\t')
-    met_df.to_pickle('all_metrics.pickle')
+  
+    filename = "all_metrics.csv"
+    print(f"Writing {filename}")
+    met_df.to_csv(filename,sep='\t')
+    filename = "all_metrics.pickle"
+    print(f"Writing {filename}")
+    met_df.to_pickle(filename)
 
 
 

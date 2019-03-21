@@ -28,6 +28,7 @@ pickled_data_filename = args.pickled_data
 savefig = args.savefig
 nnodes = args.nnodes
 
+print(f"Reading {pickled_data_filename}")
 data = pd.read_pickle(pickled_data_filename)
 
 #qos_varying_columns = ['Avgqtall', 'Avgqtpr', 'Avgqtno-pr', 'Avgqtlt', 
