@@ -76,7 +76,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--data_prefix",
         type=str,
-        help="Path prefix to where the directories containing the data are."
+        help="Path prefix to where the directories containing the data are.",
         required=True)
     
     args = parser.parse_args()
