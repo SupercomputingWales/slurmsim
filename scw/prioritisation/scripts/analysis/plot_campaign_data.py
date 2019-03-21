@@ -54,7 +54,7 @@ for col in qos_varying_columns:
         num = data.loc[idx,col]
         data.loc[idx,col+'Rel'] = num/denom
 
-data['Usage'] = data.TCHall / data.TotCHAvail
+data['Usage'] = data.TCHall / data.TotCHAvail * nnodes
 data['PrVsAll'] = data.TCHpr / data.TCHall
 
 data = data.reset_index()
@@ -95,7 +95,7 @@ def markerstyle(usage_level,prvsall_level):
         return markerstyles[idx]
 
 
-def pldf(df,metrics_df_index_names,ob):
+def pldf_generic(df,metrics_df_index_names,ob,f):
     dfr = df.reset_index()
     name0 = metrics_df_index_names[0]
     name1 = metrics_df_index_names[1]
@@ -107,13 +107,20 @@ def pldf(df,metrics_df_index_names,ob):
     ls = linestyle(usage_level,prvsall_level)
     ms = markerstyle(usage_level,prvsall_level)
 
+    f(usage_level,prvsall_level,df,label,color,ls,ms)
+
+def action1(usage_level,prvsall_level,df,label,color,ls,ms):
     plt.plot(df.QOSPriority, df[ob] / np.timedelta64(1, 'h'), label=label,
             color = color, linestyle = ls, marker = ms)
+
+def pldf_1(df,metrics_df_index_names,ob):
+    pldf_generic(df,metrics_df_index_names,ob,action1)
       
 for ob in qos_varying_columns+quartiles_columns:
     plt.figure()
     plt.yscale('log')
-    data.groupby(metrics_df_index_names).apply(lambda df: pldf(df,metrics_df_index_names,ob))
+    for _,group in data.groupby(metrics_df_index_names):
+        pldf_1(group,metrics_df_index_names,ob)
 
     plt.title("Effects of PriorityWeightQOS")
     plt.xlabel('PriorityWeightQOS')
@@ -134,8 +141,11 @@ relative_minima = data.loc[:,metrics_df_index_names+
         qos_varying_columns_rel ].groupby(
                 metrics_df_index_names).min(axis='index')
 
-relative_maxima['Usage'] = usage_avg*nnodes
-relative_minima['Usage'] = usage_avg*nnodes
+# the Usage column in relative_maxima and relative_minima 
+# is now set to the maximum or the minimum in the group (which should 
+# not be really different). But it should be set to the average of the group.
+relative_maxima['Usage'] = usage_avg
+relative_minima['Usage'] = usage_avg
 
 relative_maxima = relative_maxima.sort_values(by='Usage')
 relative_minima = relative_minima.sort_values(by='Usage')
@@ -162,21 +172,14 @@ for col in qos_varying_columns_rel:
 plt.figure()
 plt.title("Simulator Runs - configuration space sampling")
 
-def pldf(df,metrics_df_index_names):
-    dfr = df.reset_index()
-    name0 = metrics_df_index_names[0]
-    name1 = metrics_df_index_names[1]
-
-    label = dfr[name0][0].strftime("%d/%m/%y") + '-' + dfr[name1][0].strftime("%d/%m/%y")
-    usage_level = np.mean(df.Usage)
-    prvsall_level = np.mean(df.PrVsAll)
-    color = [ cf(usage_level,prvsall_level) for cf in colorfuns ]
-    ls = linestyle(usage_level,prvsall_level)
-    ms = markerstyle(usage_level,prvsall_level)
+def action2(usage_level,prvsall_level,df,label,color,ls,ms):
     plt.plot(usage_level,prvsall_level,marker = ms,color=color,label=label)
 
+def pldf_2(df,metrics_df_index_names):
+    pldf_generic(df,metrics_df_index_names,None,action2)
 
-data.groupby(metrics_df_index_names).apply(lambda df: pldf(df,metrics_df_index_names))
+for _,group in data.groupby(metrics_df_index_names):
+    pldf_2(group,metrics_df_index_names)
 
 plt.xlabel(f'Mean Usage Estimate ({nnodes}=full cluster)')
 plt.ylabel('Usage by prioritised users/usage by all users')
