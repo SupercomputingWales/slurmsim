@@ -27,12 +27,19 @@ if __name__ == "__main__":
     parser.add_argument("--savefig",action = 'store_true',
             help="Save figures in .eps format instead of plotting.")
     
+    parser.add_argument(
+        "--data_prefix",
+        type=str,
+        help="Path prefix to where the directories containing the data are.",
+        required=True)
+    
     args = parser.parse_args()
     
     settings_table = bl.read_cycle_info_file(args.cycle_data)
     max_cpus = args.max_cpus
     prioritized_accounts = cm.get_palist(args.pa)
     savefig = args.savefig
+    data_prefix = args.data_prefix
 
     already_done = set()
 
@@ -43,13 +50,15 @@ if __name__ == "__main__":
             settings_table.AnalysisStart,
             settings_table.AnalysisEnd):
  
-        original_res_name = os.path.join(bl.dirname(SimulationStart, SimulationEnd, PriorityWeightQOS),
+        original_res_name = os.path.join(data_prefix,
+                bl.dirname(SimulationStart, SimulationEnd, PriorityWeightQOS),
 		bl.original_res_basename)
 
         AnalysisStart   = pd.to_datetime(AnalysisStart  ,format = '%d%m%y')
         AnalysisEnd     = pd.to_datetime(AnalysisEnd    ,format = '%d%m%y')
 
         if (AnalysisStart,AnalysisEnd) not in already_done:
+            print(f"Reading {original_res_name}")
             data_all = pd.read_csv(original_res_name, sep='|')
             data_all = cm.fix_dataframe(data_all)
             data_all = cm.crop_dataset(data_all,AnalysisStart,AnalysisEnd)
@@ -59,10 +68,5 @@ if __name__ == "__main__":
             csot.plots_dataframe(data_all,prioritized_accounts,'',axes)
             csot.finalise_plots(AnalysisStart,AnalysisEnd,axes,savefig)
             already_done.add((AnalysisStart,AnalysisEnd))
-
-
-
-
- 
 
 

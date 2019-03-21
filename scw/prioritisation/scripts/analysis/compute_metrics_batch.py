@@ -85,7 +85,7 @@ if __name__ == "__main__":
 
     prioritized_accounts = cm.get_palist(args.pa)
 
-    data_prefix =parser.data_prefix
+    data_prefix = args.data_prefix
    
     metrics = analyse_all_from_table(settings_table,
             prioritized_accounts,
