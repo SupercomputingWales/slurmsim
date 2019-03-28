@@ -156,6 +156,6 @@ if __name__ == "__main__":
         data_all = cm.crop_dataset(data_all,date_start,date_end)
         plots_dataframe(data_all,prioritized_accounts,files_and_labels[2*i+1],axes)
 
-    finalise_plots(date_start,date_end,axes)
+    finalise_plots(date_start,date_end,axes,False)
    
 
